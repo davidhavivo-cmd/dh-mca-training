@@ -1101,7 +1101,7 @@ Day 30+: Long-term nurture — monthly check-in list</div>
         body: JSON.stringify({
           model: 'claude-sonnet-4-5',
           max_tokens: 500,
-          system: `You are an expert MCA sales coach reviewing a trainee live roleplay response. Respond in EXACTLY this format:\n\nSCORE: [X.X]/10\n\nWHAT YOU DID WELL:\n[1-2 sentences]\n\nWHAT YOU MISSED:\n[1-2 sentences]\n\nBRIDGE THE GAP:\n[1 specific actionable thing with example wording to get closer to a 10]\n\nScoring: 9-10=near perfect; 7-8=solid minor gaps; 5-6=decent missing key elements; 3-4=significant issues; 1-2=fundamentals missing. Be honest. Scenario: ${s.label}`,
+          system: `You are an expert MCA sales coach reviewing a trainee live roleplay response. Respond in EXACTLY this format:\n\nSCORE: [XX]/100\n\nWHAT YOU DID WELL:\n[1-2 sentences]\n\nWHAT YOU MISSED:\n[1-2 sentences]\n\nBRIDGE THE GAP:\n[1 specific actionable thing with example wording to get closer to 100]\n\nScoring: 93-100=A near perfect; 80-92=B solid with gaps; 70-79=C decent missing elements; 60-69=D significant issues; below 60=F fundamentals missing; 1-29=fundamentals missing. Be honest. Scenario: ${s.label}`,
           messages: [{ role: 'user', content: `Merchant said: "${lastMerchantLine}"\nRep responded: "${text}"\nMerchant replied: "${merchantReply}"\n\nCoach feedback:` }]
         })
       });
@@ -1110,19 +1110,33 @@ Day 30+: Long-term nurture — monthly check-in list</div>
         const coachData = await coachRes.json();
         const rawText = coachData.content.map(c => c.text || '').join('');
 
-        const scoreMatch = rawText.match(/SCORE:\s*(\d+\.?\d*)\/10/);
-        const score = scoreMatch ? parseFloat(scoreMatch[1]) : null;
+        const scoreMatch = rawText.match(/SCORE:\s*(\d+)\/100/);
+        const score = scoreMatch ? parseInt(scoreMatch[1]) : null;
         let scoreColor = '#e07070';
-        if (score >= 8) scoreColor = '#27AE60';
-        else if (score >= 6) scoreColor = '#E8B84B';
+        if (score >= 90) scoreColor = '#27AE60';
+        else if (score >= 80) scoreColor = '#4a9ede';
+        else if (score >= 70) scoreColor = '#E8B84B';
+        else if (score >= 60) scoreColor = '#e07070';
+        let grade = 'F';
+        if (score >= 97) grade = 'A+';
+        else if (score >= 93) grade = 'A';
+        else if (score >= 90) grade = 'A-';
+        else if (score >= 87) grade = 'B+';
+        else if (score >= 83) grade = 'B';
+        else if (score >= 80) grade = 'B-';
+        else if (score >= 77) grade = 'C+';
+        else if (score >= 73) grade = 'C';
+        else if (score >= 70) grade = 'C-';
+        else if (score >= 65) grade = 'D+';
+        else if (score >= 60) grade = 'D';
 
-        const body = rawText.replace(/SCORE:.*\/10/, '')
+        const body = rawText.replace(/SCORE:.*\/100/, '')
           .replace('WHAT YOU DID WELL:', '<div style="margin-top:12px"><strong style="color:#7dce9c;font-size:11px;text-transform:uppercase;letter-spacing:1px">✓ What You Did Well</strong></div>')
           .replace('WHAT YOU MISSED:', '<div style="margin-top:12px"><strong style="color:#e07070;font-size:11px;text-transform:uppercase;letter-spacing:1px">✗ What You Missed</strong></div>')
           .replace('BRIDGE THE GAP:', '<div style="margin-top:12px"><strong style="color:#E8B84B;font-size:11px;text-transform:uppercase;letter-spacing:1px">→ Bridge The Gap</strong></div>')
           .trim();
 
-        const scoreHTML = score !== null ? `<div style="display:flex;align-items:center;gap:16px;padding-bottom:16px;margin-bottom:4px;border-bottom:1px solid #252525"><div style="font-family:'Bebas Neue',sans-serif;font-size:56px;color:${scoreColor};line-height:1;letter-spacing:2px">${score.toFixed(1)}</div><div><div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:2px">Score out of 10.00</div><div style="width:140px;height:5px;background:#252525;border-radius:3px;overflow:hidden;margin-top:6px"><div style="height:100%;width:${(score/10)*100}%;background:${scoreColor};border-radius:3px"></div></div></div></div>` : '';
+        const scoreHTML = score !== null ? `<div style="display:flex;align-items:center;gap:20px;padding-bottom:16px;margin-bottom:4px;border-bottom:1px solid #252525"><div style="font-family:'Bebas Neue',sans-serif;font-size:64px;color:${scoreColor};line-height:1;letter-spacing:2px">${score}</div><div style="display:flex;flex-direction:column;gap:2px"><div style="font-family:'Bebas Neue',sans-serif;font-size:40px;color:${scoreColor};line-height:1;letter-spacing:2px">${grade}</div><div style="font-size:10px;color:#555;text-transform:uppercase;letter-spacing:1.5px;margin-top:4px">Score out of 100</div><div style="width:160px;height:5px;background:#252525;border-radius:3px;overflow:hidden;margin-top:6px"><div style="height:100%;width:${score}%;background:${scoreColor};border-radius:3px"></div></div></div></div>` : '';
 
         document.getElementById('feedbackTitle').textContent = '🎯 Coach Feedback';
         document.getElementById('feedbackText').innerHTML = scoreHTML + '<div style="font-size:13px;color:#bbb;line-height:1.8">' + body + '</div>';
