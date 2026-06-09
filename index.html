@@ -1101,8 +1101,8 @@ Day 30+: Long-term nurture — monthly check-in list</div>
         body: JSON.stringify({
           model: 'claude-sonnet-4-5',
           max_tokens: 500,
-          system: `You are an expert MCA sales coach reviewing a trainee live roleplay response. Respond in EXACTLY this format:\n\nSCORE: [XX]/100\n\nWHAT YOU DID WELL:\n[1-2 sentences]\n\nWHAT YOU MISSED:\n[1-2 sentences]\n\nBRIDGE THE GAP:\n[1 specific actionable thing with example wording to get closer to 100]\n\nScoring: 93-100=A near perfect; 80-92=B solid with gaps; 70-79=C decent missing elements; 60-69=D significant issues; below 60=F fundamentals missing; 1-29=fundamentals missing. Be honest. Scenario: ${s.label}`,
-          messages: [{ role: 'user', content: `Merchant said: "${lastMerchantLine}"\nRep responded: "${text}"\nMerchant replied: "${merchantReply}"\n\nCoach feedback:` }]
+          system: `You are an expert MCA sales coach. You will be given what a merchant said and how the sales rep responded. Evaluate ONLY the rep's response — judge how well they handled what the merchant said at that specific moment. Do NOT penalize for anything that came after their response. Respond in EXACTLY this format:\n\nSCORE: [XX]/100\n\nWHAT YOU DID WELL:\n[1-2 sentences]\n\nWHAT YOU MISSED:\n[1-2 sentences]\n\nBRIDGE THE GAP:\n[1 specific actionable thing with example wording to get closer to 100]\n\nScoring: 93-100=A near perfect; 80-92=B solid with gaps; 70-79=C decent missing elements; 60-69=D significant issues; below 60=F fundamentals missing; 1-29=fundamentals missing. Be honest. Scenario: ${s.label}`,
+          messages: [{ role: 'user', content: `The merchant said: "${lastMerchantLine}"\n\nThe sales rep responded with: "${text}"\n\nEvaluate ONLY the rep's response above. Do NOT factor in anything that happened after. Score how well the rep handled what the merchant said at that moment.\n\nCoach feedback:` }]
         })
       });
 
