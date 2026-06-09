@@ -1007,8 +1007,15 @@ Day 30+: Long-term nurture — monthly check-in list</div>
               <input type="number" id="db_factor" value="1.35" step="0.01" min="1.10" max="1.60" oninput="calcDeal()" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:16px;padding:10px 14px;outline:none;transition:border-color 0.15s" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
             </div>
             <div>
-              <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Estimated Term (months)</label>
-              <input type="number" id="db_term" value="9" min="3" max="24" oninput="calcDeal()" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:16px;padding:10px 14px;outline:none;transition:border-color 0.15s" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
+              <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Estimated Term</label>
+              <div style="display:flex;gap:8px">
+                <input type="number" id="db_term" value="9" min="1" max="999" oninput="calcDeal()" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:16px;padding:10px 14px;outline:none;transition:border-color 0.15s" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
+                <select id="db_term_unit" onchange="calcDeal()" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--gold-light);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:10px 14px;outline:none;cursor:pointer;min-width:110px">
+                  <option value="days">Days</option>
+                  <option value="weeks">Weeks</option>
+                  <option value="months" selected>Months</option>
+                </select>
+              </div>
             </div>
             <div>
               <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Monthly Business Revenue ($)</label>
@@ -1027,7 +1034,7 @@ Day 30+: Long-term nurture — monthly check-in list</div>
             <div id="db_cost" style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--red);letter-spacing:1px">$35,000</div>
           </div>
           <div class="card" style="margin-bottom:0">
-            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Daily Payment</div>
+            <div id="db_daily_label" style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Daily Payment</div>
             <div id="db_daily" style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--text);letter-spacing:1px">$714/day</div>
           </div>
           <div class="card" style="margin-bottom:0">
@@ -1279,21 +1286,50 @@ Day 30+: Long-term nurture — monthly check-in list</div>
   function calcDeal() {
     const advance = parseFloat(document.getElementById('db_advance').value) || 0;
     const factor = parseFloat(document.getElementById('db_factor').value) || 1.35;
-    const termMonths = parseFloat(document.getElementById('db_term').value) || 9;
+    const termVal = parseFloat(document.getElementById('db_term').value) || 9;
+    const termUnit = document.getElementById('db_term_unit').value;
     const revenue = parseFloat(document.getElementById('db_revenue').value) || 0;
-    const bizDays = Math.round(termMonths * 21);
+
+    // Convert term to business days
+    let bizDays;
+    if (termUnit === 'days') bizDays = Math.round(termVal);
+    else if (termUnit === 'weeks') bizDays = Math.round(termVal * 5);
+    else bizDays = Math.round(termVal * 21); // months
+
     const payback = advance * factor;
     const cost = payback - advance;
-    const daily = bizDays > 0 ? payback / bizDays : 0;
-    const pct = revenue > 0 ? ((daily * 21) / revenue * 100) : 0;
+
+    // Payment per period
+    const payPerDay = bizDays > 0 ? payback / bizDays : 0;
+    const payPerWeek = payPerDay * 5;
+    const payPerMonth = payPerDay * 21;
+
+    // Show payment in selected unit
+    let paymentDisplay, paymentLabel, pitchPayment;
+    if (termUnit === 'days') {
+      paymentDisplay = fmtD(payPerDay);
+      paymentLabel = 'Daily Payment';
+      pitchPayment = fmtD(payPerDay) + ' per day';
+    } else if (termUnit === 'weeks') {
+      paymentDisplay = '$' + Math.round(payPerWeek).toLocaleString() + '/week';
+      paymentLabel = 'Weekly Payment';
+      pitchPayment = '$' + Math.round(payPerWeek).toLocaleString() + ' per week';
+    } else {
+      paymentDisplay = fmtD(payPerDay) + ' · $' + Math.round(payPerWeek).toLocaleString() + '/wk';
+      paymentLabel = 'Daily · Weekly Payment';
+      pitchPayment = fmtD(payPerDay) + ' per day ($' + Math.round(payPerWeek).toLocaleString() + '/week)';
+    }
+
+    const pct = revenue > 0 ? ((payPerMonth) / revenue * 100) : 0;
 
     document.getElementById('db_payback').textContent = fmt(payback);
     document.getElementById('db_cost').textContent = fmt(cost);
-    document.getElementById('db_daily').textContent = fmtD(daily);
+    document.getElementById('db_daily').textContent = paymentDisplay;
+    document.getElementById('db_daily_label').textContent = paymentLabel;
     document.getElementById('db_pct').textContent = pct.toFixed(1) + '% of monthly revenue';
 
     const pitchLine = advance > 0
-      ? `"We can get you ${fmt(advance)} — your payback would be ${fmt(payback)}, and your daily payment comes out to around ${fmtD(daily)}. On ${fmt(revenue)}/month in revenue, that's only ${pct.toFixed(1)}% of your monthly deposits. What would you do with that capital right now?"`
+      ? `"We can get you ${fmt(advance)} — your payback would be ${fmt(payback)}, and your payment comes out to around ${pitchPayment}. On ${fmt(revenue)}/month in revenue, that's only ${pct.toFixed(1)}% of your monthly deposits. What would you do with that capital right now?"`
       : 'Enter your deal details to generate a pitch line.';
     document.getElementById('db_pitch').textContent = pitchLine;
 
@@ -1305,10 +1341,15 @@ Day 30+: Long-term nurture — monthly check-in list</div>
         const pb = advance * r;
         const c = pb - advance;
         const d = bizDays > 0 ? pb / bizDays : 0;
+        const dw = d * 5;
+        let payStr;
+        if (termUnit === 'days') payStr = fmtD(d);
+        else if (termUnit === 'weeks') payStr = '$' + Math.round(dw).toLocaleString() + '/wk';
+        else payStr = fmtD(d) + ' · $' + Math.round(dw).toLocaleString() + '/wk';
         const cells = row.querySelectorAll('td');
         if (cells[1]) cells[1].textContent = fmt(pb);
         if (cells[2]) cells[2].textContent = fmt(c);
-        if (cells[3]) cells[3].textContent = fmtD(d);
+        if (cells[3]) cells[3].textContent = payStr;
       }
     });
   }
