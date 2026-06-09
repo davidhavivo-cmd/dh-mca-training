@@ -1070,7 +1070,7 @@ Day 30+: Long-term nurture — monthly check-in list</div>
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-5',
           max_tokens: 200,
           system: s.system,
           messages: chatHistory
@@ -1099,7 +1099,7 @@ Day 30+: Long-term nurture — monthly check-in list</div>
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-5',
           max_tokens: 200,
           system: `You are an expert MCA sales coach. Review the trainee's response during a live roleplay drill. Be direct, specific, and constructive. In 2-4 sentences: what did they do well, what did they miss, and one specific thing to do differently next time. Scenario: ${s.label}`,
           messages: [{ role: 'user', content: `Merchant said: "${lastMerchantLine}"\nRep responded: "${text}"\nMerchant replied: "${merchantReply}"\n\nCoach feedback:` }]
