@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DH-MCA Training</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+  :root {
+    --black: #0A0A0A; --surface: #111111; --panel: #181818; --border: #252525;
+    --gold: #C8972A; --gold-light: #E8B84B; --gold-dim: rgba(200,151,42,0.15);
+    --red: #C0392B; --green: #27AE60; --text: #E8E8E8; --muted: #888; --dim: #555;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--black); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; }
+  .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 24px; display: flex; align-items: center; gap: 16px; height: 60px; position: sticky; top: 0; z-index: 100; }
+  .header-logo { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--gold); }
+  .header-sub { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+  .header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .progress-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .progress-bar-wrap { width: 120px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.4s ease; }
+  .layout { display: flex; min-height: calc(100vh - 60px); }
+  .sidebar { width: 230px; background: var(--surface); border-right: 1px solid var(--border); padding: 20px 0; flex-shrink: 0; position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto; }
+  .sidebar-section { padding: 0 16px 8px; font-size: 10px; color: var(--dim); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 16px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 16px; cursor: pointer; font-size: 13px; color: var(--muted); border-left: 2px solid transparent; transition: all 0.15s; }
+  .nav-item:hover { background: var(--panel); color: var(--text); }
+  .nav-item.active { background: var(--gold-dim); color: var(--gold-light); border-left-color: var(--gold); }
+  .nav-item.completed .nav-check { color: var(--green); }
+  .nav-day { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--dim); min-width: 28px; }
+  .nav-item.active .nav-day { color: var(--gold); }
+  .nav-check { font-size: 12px; margin-left: auto; }
+  .main { flex: 1; padding: 32px; max-width: 940px; }
+  .module { display: none; }
+  .module.active { display: block; }
+  .module-header { margin-bottom: 32px; }
+  .module-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .module-title { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 2px; line-height: 1; color: var(--text); margin-bottom: 12px; }
+  .module-subtitle { font-size: 15px; color: var(--muted); line-height: 1.6; max-width: 640px; }
+  .card { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 20px; }
+  .card-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-light); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .card-title .icon { font-size: 16px; }
+  .concept-list { list-style: none; }
+  .concept-list li { padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 14px; line-height: 1.6; color: var(--text); display: flex; gap: 10px; align-items: flex-start; }
+  .concept-list li:last-child { border-bottom: none; }
+  .concept-bullet { color: var(--gold); font-size: 18px; line-height: 1.2; flex-shrink: 0; }
+  .obj-table { width: 100%; border-collapse: collapse; }
+  .obj-table th { text-align: left; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  .obj-table td { padding: 14px 12px; font-size: 13px; border-bottom: 1px solid #1e1e1e; vertical-align: top; line-height: 1.5; }
+  .obj-table tr:last-child td { border-bottom: none; }
+  .obj-table td:first-child { color: var(--red); font-weight: 600; }
+  .obj-table td:last-child { color: #aaa; }
+  .roleplay-container { background: #0d0d0d; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .roleplay-top { background: var(--panel); padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .roleplay-mode { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+  .scenario-badge { background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold-light); font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 600; }
+  .chat-area { padding: 20px; min-height: 280px; max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+  .msg { display: flex; gap: 10px; align-items: flex-start; max-width: 85%; }
+  .msg.merchant { align-self: flex-start; }
+  .msg.rep { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .merchant .msg-avatar { background: #1a1a2e; border: 1px solid #333; }
+  .rep .msg-avatar { background: var(--gold-dim); border: 1px solid var(--gold); }
+  .msg-bubble { padding: 10px 14px; border-radius: 12px; font-size: 13px; line-height: 1.5; }
+  .merchant .msg-bubble { background: var(--panel); border: 1px solid var(--border); color: var(--text); border-top-left-radius: 4px; }
+  .rep .msg-bubble { background: var(--gold-dim); border: 1px solid var(--gold); color: var(--gold-light); border-top-right-radius: 4px; }
+  .msg-label { font-size: 10px; color: var(--dim); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
+  .rep .msg-label { text-align: right; }
+  .chat-input-area { padding: 16px 20px; border-top: 1px solid var(--border); display: flex; gap: 10px; align-items: flex-start; }
+  .chat-input { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'Inter', sans-serif; font-size: 13px; padding: 10px 14px; resize: none; min-height: 44px; max-height: 120px; outline: none; transition: border-color 0.15s; }
+  .chat-input:focus { border-color: var(--gold); }
+  .chat-input::placeholder { color: var(--dim); }
+  .btn { padding: 10px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; font-family: 'Inter', sans-serif; }
+  .btn-gold { background: var(--gold); color: #000; }
+  .btn-gold:hover { background: var(--gold-light); }
+  .btn-gold:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { color: var(--text); border-color: var(--muted); }
+  .scenario-selector { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .scenario-btn { padding: 6px 14px; border-radius: 20px; font-size: 12px; cursor: pointer; border: 1px solid var(--border); background: var(--panel); color: var(--muted); transition: all 0.15s; font-family: 'Inter', sans-serif; }
+  .scenario-btn:hover, .scenario-btn.active { border-color: var(--gold); color: var(--gold-light); background: var(--gold-dim); }
+  .feedback-box { background: #0a1a0a; border: 1px solid var(--green); border-radius: 8px; padding: 16px 20px; margin-top: 12px; display: none; }
+  .feedback-box.show { display: block; }
+  .feedback-box.warn { background: #1a0a0a; border-color: var(--red); }
+  .feedback-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--green); margin-bottom: 8px; }
+  .feedback-box.warn .feedback-title { color: var(--red); }
+  .feedback-text { font-size: 13px; color: #aaa; line-height: 1.6; }
+  .quiz-q { margin-bottom: 24px; }
+  .quiz-question { font-size: 15px; font-weight: 600; margin-bottom: 12px; line-height: 1.5; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-option { padding: 12px 16px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 13px; transition: all 0.15s; background: var(--panel); }
+  .quiz-option:hover { border-color: var(--gold); color: var(--gold-light); }
+  .quiz-option.correct { border-color: var(--green); background: #0a1a0a; color: #7dce9c; }
+  .quiz-option.wrong { border-color: var(--red); background: #1a0a0a; color: #e07070; }
+  .quiz-option.disabled { cursor: default; }
+  .checklist { list-style: none; }
+  .checklist li { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; line-height: 1.5; cursor: pointer; }
+  .checklist li:last-child { border-bottom: none; }
+  .check-box { width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 4px; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-size: 11px; color: var(--green); }
+  .checklist li.done .check-box { background: var(--green); border-color: var(--green); color: #000; }
+  .checklist li.done span { color: var(--dim); text-decoration: line-through; }
+  .stats-row { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+  .stat-box { flex: 1; min-width: 80px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; }
+  .stat-number { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--gold); letter-spacing: 1px; }
+  .stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
+  .formula { background: #0d0d0d; border: 1px solid var(--gold-dim); border-left: 3px solid var(--gold); padding: 16px 20px; border-radius: 0 8px 8px 0; font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--gold-light); margin: 12px 0; line-height: 1.8; }
+  .loading-dots { display: inline-flex; gap: 4px; align-items: center; padding: 8px 4px; }
+  .loading-dots span { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); animation: dot-pulse 1.2s ease-in-out infinite; }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes dot-pulse { 0%,80%,100%{opacity:0.2;transform:scale(0.8)}40%{opacity:1;transform:scale(1)} }
+  .day-complete-banner { background: linear-gradient(135deg,#0a1a0a,#0d200d); border: 1px solid var(--green); border-radius: 8px; padding: 20px 24px; text-align: center; margin-top: 24px; display: none; }
+  .day-complete-banner.show { display: block; }
+  .day-complete-banner h3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--green); letter-spacing: 2px; margin-bottom: 8px; }
+  .day-complete-banner p { font-size: 13px; color: var(--muted); }
+  .tab-nav { display: flex; border-bottom: 1px solid var(--border); margin-bottom: 24px; gap: 0; flex-wrap: wrap; }
+  .tab-btn { padding: 10px 18px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border: none; background: transparent; color: var(--muted); border-bottom: 2px solid transparent; margin-bottom: -1px; font-family: 'Inter', sans-serif; transition: all 0.15s; }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--gold-light); border-bottom-color: var(--gold); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .tip-box { background: #0d1520; border: 1px solid #1a3a5c; border-left: 3px solid #4a9ede; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 12px 0; }
+  .tip-box p { font-size: 13px; color: #8ab4d4; line-height: 1.6; }
+  .tip-box strong { color: #6fc3f0; }
+  /* SCRIPT CARDS */
+  .script-block { background: #0d0d0d; border: 1px solid #2a2a2a; border-radius: 8px; margin-bottom: 20px; overflow: hidden; }
+  .script-header { background: var(--panel); padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+  .script-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; padding: 3px 10px; border-radius: 20px; }
+  .tag-cold { background: rgba(192,57,43,0.2); color: #e07070; border: 1px solid rgba(192,57,43,0.4); }
+  .tag-dialer { background: rgba(200,151,42,0.2); color: var(--gold-light); border: 1px solid rgba(200,151,42,0.4); }
+  .tag-inbound { background: rgba(39,174,96,0.2); color: #7dce9c; border: 1px solid rgba(39,174,96,0.4); }
+  .tag-email { background: rgba(74,158,222,0.2); color: #8ab4d4; border: 1px solid rgba(74,158,222,0.4); }
+  .tag-voicemail { background: rgba(155,89,182,0.2); color: #c39bd3; border: 1px solid rgba(155,89,182,0.4); }
+  .script-title { font-size: 14px; font-weight: 600; color: var(--text); }
+  .script-body { padding: 20px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: #bbb; line-height: 1.9; white-space: pre-wrap; }
+  .script-note { padding: 12px 20px; background: #111; border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); font-style: italic; }
+  /* TERMS GLOSSARY */
+  .terms-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media(max-width:700px){ .terms-grid { grid-template-columns: 1fr; } }
+  .term-card { background: #0d0d0d; border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; }
+  .term-name { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--gold-light); font-weight: 600; margin-bottom: 6px; }
+  .term-def { font-size: 12px; color: #aaa; line-height: 1.6; }
+  /* LENDER TIERS */
+  .tier-card { border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; border-left: 4px solid; }
+  .tier-a { background: rgba(39,174,96,0.07); border-color: #27AE60; }
+  .tier-b { background: rgba(200,151,42,0.07); border-color: var(--gold); }
+  .tier-c { background: rgba(192,57,43,0.07); border-color: var(--red); }
+  .tier-high { background: rgba(155,89,182,0.07); border-color: #9b59b6; }
+  .tier-reverse { background: rgba(74,158,222,0.07); border-color: #4a9ede; }
+  .tier-name { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; margin-bottom: 4px; }
+  .tier-a .tier-name { color: #27AE60; }
+  .tier-b .tier-name { color: var(--gold-light); }
+  .tier-c .tier-name { color: #e07070; }
+  .tier-high .tier-name { color: #c39bd3; }
+  .tier-reverse .tier-name { color: #8ab4d4; }
+  .tier-sub { font-size: 12px; color: var(--muted); margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+  .tier-specs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .tier-spec { background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 4px; padding: 5px 12px; font-size: 11px; color: var(--text); font-family: 'JetBrains Mono', monospace; }
+  .tier-bullets { list-style: none; }
+  .tier-bullets li { font-size: 13px; color: #bbb; padding: 4px 0; display: flex; gap: 8px; line-height: 1.5; }
+  .tier-bullets li::before { content: '›'; color: var(--muted); flex-shrink: 0; }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <div class="header-logo">DH-MCA TRAINING</div>
+    <div class="header-sub">Sales Training System — Days 1 through 10</div>
+  </div>
+  <div class="header-right">
+    <span class="progress-label">Progress</span>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar" style="width:9%"></div>
+    </div>
+    <span style="font-size:12px;color:var(--muted)" id="progressText">Day 1</span>
+  </div>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-section">Foundation</div>
+    <div class="nav-item active" onclick="goDay(1)"><span class="nav-day">D01</span> Know The Product<span class="nav-check" id="chk1"></span></div>
+    <div class="nav-item" onclick="goDay(2)"><span class="nav-day">D02</span> Know The Math<span class="nav-check" id="chk2"></span></div>
+    <div class="sidebar-section">The Merchant</div>
+    <div class="nav-item" onclick="goDay(3)"><span class="nav-day">D03</span> Who You're Calling<span class="nav-check" id="chk3"></span></div>
+    <div class="nav-item" onclick="goDay(4)"><span class="nav-day">D04</span> Pain Points &amp; Triggers<span class="nav-check" id="chk4"></span></div>
+    <div class="sidebar-section">The Sales Process</div>
+    <div class="nav-item" onclick="goDay(5)"><span class="nav-day">D05</span> The Opening Call<span class="nav-check" id="chk5"></span></div>
+    <div class="nav-item" onclick="goDay(6)"><span class="nav-day">D06</span> Qualifying &amp; Pitching<span class="nav-check" id="chk6"></span></div>
+    <div class="sidebar-section">Closing</div>
+    <div class="nav-item" onclick="goDay(7)"><span class="nav-day">D07</span> Objection Handling<span class="nav-check" id="chk7"></span></div>
+    <div class="nav-item" onclick="goDay(8)"><span class="nav-day">D08</span> Roleplay Simulator<span class="nav-check" id="chk8"></span></div>
+    <div class="sidebar-section">Operations</div>
+    <div class="nav-item" onclick="goDay(9)"><span class="nav-day">D09</span> Submissions &amp; UW<span class="nav-check" id="chk9"></span></div>
+    <div class="nav-item" onclick="goDay(10)"><span class="nav-day">D10</span> Pipeline &amp; Mindset<span class="nav-check" id="chk10"></span></div>
+    <div class="nav-item" onclick="goDay(11)"><span class="nav-day">REF</span> Assisting Documents<span class="nav-check" id="chk11"></span></div>
+  </div>
+
+  <div class="main">
+
+    <!-- DAY 1 -->
+    <div class="module active" id="day1">
+      <div class="module-header">
+        <div class="module-eyebrow">Day 01 — Foundation</div>
+        <div class="module-title">Know What You're Selling</div>
+        <div class="module-subtitle">Before you say a single word to a merchant, you need to own the product. If you can't explain it in 30 seconds, you're not ready to dial.</div>
+      </div>
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab(this,'d1-concepts')">Core Concepts</button>
+        <button class="tab-btn" onclick="switchTab(this,'d1-script')">Elevator Script</button>
+        <button class="tab-btn" onclick="switchTab(this,'d1-quiz')">Knowledge Check</button>
+      </div>
+      <div class="tab-content active" id="d1-concepts">
+        <div class="card">
+          <div class="card-title"><span class="icon">⚡</span> The Most Important Distinction</div>
+          <div class="tip-box"><p><strong>MCA is NOT a loan.</strong> It is a purchase of future receivables. The funder buys a percentage of future revenue at a discount. This matters legally, in how you pitch, and in how the merchant perceives cost.</p></div>
+          <ul class="concept-list">
+            <li><span class="concept-bullet">›</span> No fixed payment schedule like a bank loan — payments flex with revenue</li>
+            <li><span class="concept-bullet">›</span> No collateral required in most cases — unsecured working capital</li>
+            <li><span class="concept-bullet">›</span> Decision in 1–3 hours. Funding in 3–24 hours depending on deal complexity.</li>
+            <li><span class="concept-bullet">›</span> Credit score matters less — business performance and cash flow are king</li>
+            <li><span class="concept-bullet">›</span> Use of funds is typically unrestricted — merchant decides</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="icon">📋</span> Basic Deal Structure</div>
+          <ul class="concept-list">
+            <li><span class="concept-bullet">›</span><div><strong>Advance Amount</strong> — the cash the merchant receives upfront (e.g., $100,000)</div></li>
+            <li><span class="concept-bullet">›</span><div><strong>Factor Rate</strong> — the multiplier applied (e.g., 1.35 × $100k = $135,000 payback)</div></li>
+            <li><span class="concept-bullet">›</span><div><strong>Payback Amount</strong> — total owed (advance × factor rate)</div></li>
+            <li><span class="concept-bullet">›</span><div><strong>Daily/Weekly Split</strong> — the percentage of deposits debited each day or week</div></li>
+            <li><span class="concept-bullet">›</span><div><strong>Term</strong> — estimated payoff period (typically 4–18 months)</div></li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="icon">✅</span> Basic Qualification Criteria</div>
+          <ul class="concept-list">
+            <li><span class="concept-bullet">›</span> Time in business: typically 6+ months (12+ months preferred)</li>
+            <li><span class="concept-bullet">›</span> Monthly revenue: usually $10k+ minimum (varies by funder)</li>
+            <li><span class="concept-bullet">›</span> Business checking account with regular deposits</li>
+            <li><span class="concept-bullet">›</span> No open bankruptcies</li>
+            <li><span class="concept-bullet">›</span> Industry type — some high-risk industries have restrictions</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tab-content" id="d1-script">
+        <div class="card">
+          <div class="card-title"><span class="icon">🎙️</span> 30-Second Elevator Pitch</div>
+          <div class="tip-box"><p>Memorize the <strong>logic</strong>, not the words. This should sound natural, not rehearsed.</p></div>
+          <div class="formula">"We work with business owners who need capital fast — and can't wait weeks for a bank to say no. We can get you a decision in 1–3 hours and funded the same day or next business day, based on your revenue — not just your credit score. Most of our clients use it for inventory, payroll gaps, or expansion. Would that be relevant to what you have going on right now?"</div>
+          <p style="font-size:13px;color:var(--muted);margin-top:12px;">Notice: no mention of rate. Lead with speed, ease, and a question that forces them to self-identify the need.</p>
+        </div>
+        <div class="card">
+          <div class="card-title"><span class="icon">🚫</span> Things To Never Say on Day 1</div>
+          <ul class="concept-list">
+            <li><span class="concept-bullet" style="color:var(--red)">✗</span> "Our rates are really competitive" — invites APR comparisons</li>
+            <li><span class="concept-bullet" style="color:var(--red)">✗</span> "It's basically like a loan" — it's not, legally or structurally</li>
+            <li><span class="concept-bullet" style="color:var(--red)">✗</span> "The factor rate is 1.35" — never lead with cost, lead with value</li>
+            <li><span class="concept-bullet" style="color:var(--red)">✗</span> "I'm calling about a business loan" — inaccurate and sets wrong expectations</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tab-content" id="d1-quiz">
+        <div class="card">
+          <div class="card-title"><span class="icon">🧠</span> Knowledge Check — Day 1</div>
+          <div class="quiz-q">
+            <div class="quiz-question">1. An MCA is legally defined as:</div>
+            <div class="quiz-options">
+              <div class="quiz-option" onclick="answer(this,'wrong')">A short-term business loan with fixed payments</div>
+              <div class="quiz-option" onclick="answer(this,'correct')">A purchase of future business receivables at a discount</div>
+              <div class="quiz-option" onclick="answer(this,'wrong')">A revolving line of credit secured by assets</div>
+            </div>
+          </div>
+          <div class="quiz-q">
+            <div class="quiz-question">2. Typical approval speed for an MCA is:</div>
+            <div class="quiz-options">
+              <div class="quiz-option" onclick="answer(this,'wrong')">24–48 hours</div>
+              <div class="quiz-option" onclick="answer(this,'correct')">1–3 hours for approval, funded same day or next business day</div>
+              <div class="quiz-option" onclick="answer(this,'wrong')">3–5 business days</div>
+            </div>
+          </div>
+          <div class="quiz-q">
+            <div class="quiz-question">3. When first pitching a merchant, you should lead with:</div>
+            <div class="quiz-options">
+              <div class="quiz-option" onclick="answer(this,'wrong')">The factor rate so they know what to expect</div>
+              <div class="quiz-option" onclick="answer(this,'wrong')">The full term and payback schedule</div>
+              <div class="quiz-option" onclick="answer(this,'correct')">Speed, ease, and a question about their need</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-gold" onclick="completeDay(1)">Mark Day 1 Complete →</button>
+    </div>
+
+    <!-- DAY 2 -->
+    <div class="module" id="day2">
+      <div class="module-header">
+        <div class="module-eyebrow">Day 02 — Foundation</div>
+        <div class="module-title">Know The Math</div>
+        <div class="module-subtitle">Numbers are your weapon and your shield. Know how to build a deal on a $100,000 advance and defend the cost — without ever saying "APR."</div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-box"><div class="stat-number">1.15</div><div class="stat-label">Lowest Factor Rate</div></div>
+        <div class="stat-box"><div class="stat-number">1.50</div><div class="stat-label">Highest Typical Rate</div></div>
+        <div class="stat-box"><div class="stat-number">1–3hr</div><div class="stat-label">Approval Time</div></div>
+        <div class="stat-box"><div class="stat-number">3–24hr</div><div class="stat-label">Funding Time</div></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🔢</span> Deal Math — Always Use $100,000 as Your Example</div>
+        <div class="formula">ADVANCE:          $100,000
+FACTOR RATE:      1.35
+─────────────────────────────────
+PAYBACK AMOUNT:   $100,000 × 1.35 = $135,000
+COST OF CAPITAL:  $135,000 − $100,000 = $35,000
+─────────────────────────────────
+Estimated term: 9 months (189 business days)
+Daily payment:  $135,000 ÷ 189 = ~$714/day
+─────────────────────────────────
+At 1.15 factor:  Payback = $115,000 | Cost = $15,000
+At 1.25 factor:  Payback = $125,000 | Cost = $25,000
+At 1.35 factor:  Payback = $135,000 | Cost = $35,000
+At 1.45 factor:  Payback = $145,000 | Cost = $45,000</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🛡️</span> Defending Cost Without Mentioning APR</div>
+        <div class="tip-box"><p>Never let the merchant convert factor rate to APR. Redirect to ROI every single time.</p></div>
+        <ul class="concept-list">
+          <li><span class="concept-bullet">›</span><div><strong>The ROI Reframe:</strong> "The cost is $35,000 on a $100,000 advance. If that capital generates $50k in new revenue next month, you made your money back before the second payment."</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>The Bank Comparison:</strong> "A bank takes weeks to decline you. We get you a decision in 1–3 hours. That window of opportunity has a real dollar value."</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>The Opportunity Cost Frame:</strong> "What's the cost of NOT having $100k this week? A missed contract? Empty shelves going into your busy season?"</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>The Daily Breakdown:</strong> "We're talking about $714 a day on a $100k advance. If your business does $5,000 a day in revenue, that's 14% of one day's revenue — and it's helping you generate more of it."</div></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">⚠️</span> Stacking — Know the Risk</div>
+        <ul class="concept-list">
+          <li><span class="concept-bullet" style="color:var(--red)">›</span> Stacking = merchant has 2+ active positions simultaneously</li>
+          <li><span class="concept-bullet" style="color:var(--red)">›</span> Most reputable funders will decline or restrict stacked deals</li>
+          <li><span class="concept-bullet" style="color:var(--red)">›</span> Always ask: "Do you currently have any business financing in place?"</li>
+          <li><span class="concept-bullet">›</span> One existing position may be workable — depends on daily balance and payback remaining</li>
+        </ul>
+      </div>
+      <button class="btn btn-gold" onclick="completeDay(2)">Mark Day 2 Complete →</button>
+    </div>
+
+    <!-- DAY 3 -->
+    <div class="module" id="day3">
+      <div class="module-header">
+        <div class="module-eyebrow">Day 03 — The Merchant</div>
+        <div class="module-title">Who You're Calling</div>
+        <div class="module-subtitle">Every merchant is different, but they all fit patterns. Learn the industries, the decision-maker types, and how to read a call in the first 90 seconds.</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🏭</span> Hot Industries for MCA</div>
+        <ul class="concept-list">
+          <li><span class="concept-bullet">›</span><div><strong>Restaurants &amp; Food Service</strong> — seasonal cash flow, high daily volume, equipment needs. They understand fast decisions.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>Contractors &amp; Construction</strong> — invoice lag, material costs upfront, job-to-job revenue. Classic working capital problem.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>Retail</strong> — inventory purchasing, holiday seasons, lease obligations.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>Trucking &amp; Logistics</strong> — fuel costs, maintenance, invoice factoring gaps.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>Medical &amp; Dental</strong> — insurance reimbursement delays create real working capital needs.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>Auto Repair</strong> — equipment, inventory, and they're used to quick financial decisions.</div></li>
+          <li><span class="concept-bullet" style="color:var(--red)">›</span><div><strong>Restricted/Difficult:</strong> Firearms, cannabis, adult entertainment, non-profits, startups under 6 months.</div></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🧭</span> The 3 Decision-Maker Types</div>
+        <ul class="concept-list">
+          <li><span class="concept-bullet">›</span><div><strong>The Owner-Operator</strong> — wears all hats, makes fast decisions, hates being sold to. Respect their time. Be direct.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>The CFO / Bookkeeper</strong> — numbers-focused, skeptical, will ask about APR. Come prepared with math and documentation.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>The Gatekeeper</strong> — receptionist, office manager. NOT your target. Always ask: "Is [owner name] available? We're reaching out about business financing."</div></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">⏱️</span> Reading a Call in 90 Seconds</div>
+        <div class="tip-box"><p>Within 90 seconds, know: <strong>Are they open? Do they have a pain point? Are they the decision-maker?</strong></p></div>
+        <ul class="concept-list">
+          <li><span class="concept-bullet">›</span> Tone of voice — rushed means bad timing, curious means you're in</li>
+          <li><span class="concept-bullet">›</span> Do they ask questions back? That's engagement.</li>
+          <li><span class="concept-bullet">›</span> "We're all set" vs "We're doing okay but..." — huge difference</li>
+          <li><span class="concept-bullet">›</span> Never fight the gatekeeper — ask for their help instead</li>
+        </ul>
+      </div>
+      <button class="btn btn-gold" onclick="completeDay(3)">Mark Day 3 Complete →</button>
+    </div>
+
+    <!-- DAY 4 -->
+    <div class="module" id="day4">
+      <div class="module-header">
+        <div class="module-eyebrow">Day 04 — The Merchant</div>
+        <div class="module-title">Pain Points &amp; Triggers</div>
+        <div class="module-subtitle">Merchants don't call you because they want an MCA. They call because something is wrong. Your job is to find the wound and show them the bandage.</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🔥</span> The 7 Merchant Pain Points</div>
+        <ul class="concept-list">
+          <li><span class="concept-bullet">1</span><div><strong>Cash Flow Gaps</strong> — money coming in next week but bills due today. Most common trigger.</div></li>
+          <li><span class="concept-bullet">2</span><div><strong>Payroll Stress</strong> — nothing creates urgency like making payroll Friday. These close fast.</div></li>
+          <li><span class="concept-bullet">3</span><div><strong>Inventory Purchasing</strong> — seasonal businesses, bulk deals, supplier discounts they can't pass up.</div></li>
+          <li><span class="concept-bullet">4</span><div><strong>Equipment Failure / Purchase</strong> — broken equipment = no revenue. Speed matters most here.</div></li>
+          <li><span class="concept-bullet">5</span><div><strong>Expansion Opportunity</strong> — second location, new hire, marketing push they need to fund now.</div></li>
+          <li><span class="concept-bullet">6</span><div><strong>Tax Obligations</strong> — quarterly taxes, IRS installments. Real urgency, real deadline.</div></li>
+          <li><span class="concept-bullet">7</span><div><strong>Slow Season Bridging</strong> — restaurants in winter, landscapers in January. They know it's coming.</div></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">💡</span> How to Uncover the Pain</div>
+        <div class="formula">"What's your biggest challenge in the business right now?"
+"Has anything changed in the last 90 days that's affected cash flow?"
+"If you had $100,000 available this week, what would be the first thing you'd do with it?"
+"What's been holding you back from growing the way you want to?"</div>
+        <div class="tip-box"><p>The last question is powerful. It assumes they <em>want</em> to grow — almost every business owner does. Now they're telling you their dream, and your capital is the vehicle.</p></div>
+      </div>
+      <button class="btn btn-gold" onclick="completeDay(4)">Mark Day 4 Complete →</button>
+    </div>
+
+    <!-- DAY 5 -->
+    <div class="module" id="day5">
+      <div class="module-header">
+        <div class="module-eyebrow">Day 05 — The Sales Process</div>
+        <div class="module-title">The Opening Call</div>
+        <div class="module-subtitle">The first 20 seconds of a cold call determine everything. Too scripted and you're dead. Too casual and you have no authority. Hit the middle.</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📞</span> The Opening Framework</div>
+        <div class="formula">[PATTERN INTERRUPT] → [WHO YOU ARE] → [WHY IT'S RELEVANT] → [PERMISSION TO CONTINUE]
+
+"Hey [Name], this is [Your Name] with [Company] — I'll be upfront, this is a cold call,
+so I'll keep it short. We help business owners access capital fast — decision in hours,
+not weeks. Is that something that's even on your radar right now, or terrible timing?"</div>
+        <div class="tip-box"><p><strong>Why "terrible timing?"</strong> — It's disarming. It signals you're not a pushy rep. It invites an honest answer instead of a reflex "not interested."</p></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🚪</span> Getting Past the Gatekeeper</div>
+        <ul class="concept-list">
+          <li><span class="concept-bullet">›</span><div><strong>Never pitch the gatekeeper.</strong> They can't approve, only block.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>Use their name if you know it:</strong> "Hi, is [owner first name] available? It's [your name] calling regarding their business account."</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>If asked what it's about:</strong> "It's regarding business financing — they would know the context."</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>Build rapport on callbacks:</strong> Remember the gatekeeper's name. Be warm. They remember who treated them well.</div></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📵</span> When They Say "Send Me Info First"</div>
+        <div class="formula">"Absolutely — I want to make sure I send the right thing. Can I ask you two quick questions so the info is actually relevant to your situation?"</div>
+        <p style="font-size:13px;color:var(--muted);margin-top:12px;">This keeps them on the call. You now have permission to qualify. If they're a real prospect, they'll answer.</p>
+      </div>
+      <button class="btn btn-gold" onclick="completeDay(5)">Mark Day 5 Complete →</button>
+    </div>
+
+    <!-- DAY 6 -->
+    <div class="module" id="day6">
+      <div class="module-header">
+        <div class="module-eyebrow">Day 06 — The Sales Process</div>
+        <div class="module-title">Qualifying &amp; Pitching</div>
+        <div class="module-subtitle">Qualify first. Pitch second. In that order, every time. A pitch without qualification is just noise.</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🎯</span> The 4 Core Qualifying Questions</div>
+        <ul class="concept-list">
+          <li><span class="concept-bullet">1</span><div><strong>"How long have you been in business?"</strong><br><span style="color:var(--muted);font-size:12px;">Minimum 6 months. Under that, most funders pass.</span></div></li>
+          <li><span class="concept-bullet">2</span><div><strong>"What's your average monthly revenue?"</strong><br><span style="color:var(--muted);font-size:12px;">Minimum $10k/month most funders. Advance range is typically 75–150% of monthly revenue.</span></div></li>
+          <li><span class="concept-bullet">3</span><div><strong>"Do you have any current business financing in place?"</strong><br><span style="color:var(--muted);font-size:12px;">One position may be OK. Two or more is a red flag.</span></div></li>
+          <li><span class="concept-bullet">4</span><div><strong>"What would you use the capital for?"</strong><br><span style="color:var(--muted);font-size:12px;">Reveals motivation. Helps you pitch to the right pain point.</span></div></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🎙️</span> The Pitch Structure (After Qualifying)</div>
+        <div class="formula">1. VALIDATE THEIR SITUATION
+"Based on what you're describing — [restate their pain] — that's exactly the scenario we help with."
+
+2. PRESENT THE SOLUTION
+"We could look at getting you somewhere in the range of $75,000–$100,000, with a decision in a few hours."
+
+3. ANCHOR THE VALUE
+"That's capital you can put to work immediately — [tie it to their stated goal]."
+
+4. NEXT STEP / MICRO-COMMITMENT
+"What I need to get you a real number is 3 months of bank statements. Can we do that today?"</div>
+      </div>
+      <button class="btn btn-gold" onclick="completeDay(6)">Mark Day 6 Complete →</button>
+    </div>
+
+    <!-- DAY 7 -->
+    <div class="module" id="day7">
+      <div class="module-header">
+        <div class="module-eyebrow">Day 07 — Closing</div>
+        <div class="module-title">Objection Handling</div>
+        <div class="module-subtitle">Objections aren't rejections. They're requests for more information or reassurance. Master these 8 and you'll close twice as many deals.</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🥊</span> The 8 Objections &amp; How to Handle Them</div>
+        <table class="obj-table">
+          <tr><th>Objection</th><th>Response</th></tr>
+          <tr><td>"The rate is too high"</td><td>Shift to ROI: "What will this $100k do for your business? If it fills one contract, does it pay for itself?" Never defend the rate — pivot to return.</td></tr>
+          <tr><td>"I need to think about it"</td><td>Uncover the real one: "Totally fair. What specifically would you want to think through? Is it the cost, the timing, or something else?"</td></tr>
+          <tr><td>"Send me the info"</td><td>"Happy to — what email? And while I have you, let me ask two quick questions so I send the right thing." Stay on the call.</td></tr>
+          <tr><td>"I already have funding"</td><td>"Are you happy with them? We work with a lot of clients who have existing positions — sometimes we can consolidate or get you better terms."</td></tr>
+          <tr><td>"I don't need money"</td><td>"Most of my best clients funded before they needed it — that's when you get the best terms. If it makes sense in 90 days, it probably makes sense now."</td></tr>
+          <tr><td>"My partner needs to decide"</td><td>"Absolutely — when can all three of us connect? I can do a quick 10-minute call with both of you." Get the decision-maker on the line.</td></tr>
+          <tr><td>"The bank gives me better rates"</td><td>"100% — banks are cheaper when they say yes. How long did your last bank application take? And did they approve you?"</td></tr>
+          <tr><td>"I've been burned before"</td><td>"That's the most common thing I hear — which is exactly why I want you to understand everything before you sign anything. Let me walk you through it."</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🔑</span> The Golden Rule of Objection Handling</div>
+        <div class="formula">Feel → Felt → Found
+
+"I understand how you FEEL — many of my clients FELT the same way — but here's what they FOUND once they moved forward..."</div>
+        <div class="tip-box"><p>This framework <strong>validates without agreeing</strong> and uses social proof to carry the point. It's not a trick — it's empathy plus evidence.</p></div>
+      </div>
+      <button class="btn btn-gold" onclick="completeDay(7)">Mark Day 7 Complete →</button>
+    </div>
+
+    <!-- DAY 8: ROLEPLAY -->
+    <div class="module" id="day8">
+      <div class="module-header">
+        <div class="module-eyebrow">Day 08 — Closing</div>
+        <div class="module-title">Roleplay Simulator</div>
+        <div class="module-subtitle">Practice live with an AI merchant. Choose a scenario and handle the call. You'll get real-time coaching after each response.</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🎭</span> Choose Your Scenario</div>
+        <div class="scenario-selector" id="scenarioSelector">
+          <button class="scenario-btn active" onclick="setScenario(this,'cold')">Cold Call — Restaurant Owner</button>
+          <button class="scenario-btn" onclick="setScenario(this,'inbound')">Inbound — Contractor</button>
+          <button class="scenario-btn" onclick="setScenario(this,'objection')">Objection — Rate Too High</button>
+          <button class="scenario-btn" onclick="setScenario(this,'stacker')">Red Flag — Stacker</button>
+        </div>
+        <div class="roleplay-container">
+          <div class="roleplay-top">
+            <span class="roleplay-mode">🔴 LIVE ROLEPLAY</span>
+            <span class="scenario-badge" id="scenarioBadge">Cold Call — Restaurant Owner</span>
+            <button class="btn btn-ghost" style="margin-left:auto;padding:6px 12px;font-size:11px" onclick="resetChat()">↺ Reset</button>
+          </div>
+          <div class="chat-area" id="chatArea">
+            <div class="msg merchant">
+              <div><div class="msg-label">Merchant</div><div class="msg-avatar">🍕</div></div>
+              <div><div class="msg-bubble">"Yeah, hello?"</div></div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <textarea class="chat-input" id="repInput" placeholder="Type your response as the sales rep..." rows="2" onkeydown="handleKey(event)"></textarea>
+            <button class="btn btn-gold" id="sendBtn" onclick="sendMessage()">Send</button>
+          </div>
+        </div>
+        <div class="feedback-box" id="feedbackBox">
+          <div class="feedback-title" id="feedbackTitle">Coach Feedback</div>
+          <div class="feedback-text" id="feedbackText"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAY 9 -->
+    <div class="module" id="day9">
+      <div class="module-header">
+        <div class="module-eyebrow">Day 09 — Operations</div>
+        <div class="module-title">Submissions &amp; Underwriting</div>
+        <div class="module-subtitle">A deal only gets funded if the submission is clean. Know what underwriters look for and you'll stop losing deals in the pipeline.</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📁</span> Clean Submission Checklist</div>
+        <ul class="checklist">
+          <li onclick="toggleCheck(this)"><div class="check-box">✓</div><span>Completed merchant application (all fields, signed)</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box">✓</div><span>3–6 months of business bank statements (most recent)</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box">✓</div><span>Voided business check</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box">✓</div><span>Government-issued ID for all owners 25%+</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box">✓</div><span>Business license or proof of ownership</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box">✓</div><span>Most recent business tax return (for larger amounts, $75k+)</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box">✓</div><span>Landlord contact (if brick-and-mortar)</span></li>
+          <li onclick="toggleCheck(this)"><div class="check-box">✓</div><span>Existing MCA contracts disclosed (if any)</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🔍</span> What Underwriters Look For</div>
+        <ul class="concept-list">
+          <li><span class="concept-bullet">›</span><div><strong>Average Daily Balance (ADB)</strong> — the floor. Low ADB = high risk. UWs want consistency.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>NSF Count</strong> — non-sufficient funds. 3+ in a month is a red flag. More than 5 may be a decline.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>Negative Days</strong> — days where the account went negative. More than a handful monthly is concerning.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>Deposit Consistency</strong> — regular deposits vs. big lumps with dry spells. Consistency = lower risk.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>Existing Positions</strong> — how much of daily revenue is already committed?</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>Revenue Trend</strong> — growing, flat, or declining? 3 months of decline = tighter terms.</div></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">❌</span> Why Deals Get Declined</div>
+        <ul class="concept-list">
+          <li><span class="concept-bullet" style="color:var(--red)">›</span> Too many NSFs or negative days in statements</li>
+          <li><span class="concept-bullet" style="color:var(--red)">›</span> Revenue doesn't match what merchant told you</li>
+          <li><span class="concept-bullet" style="color:var(--red)">›</span> Undisclosed existing positions discovered in statements</li>
+          <li><span class="concept-bullet" style="color:var(--red)">›</span> Business under 6 months old</li>
+          <li><span class="concept-bullet" style="color:var(--red)">›</span> Open bankruptcy or prior default on MCA</li>
+          <li><span class="concept-bullet" style="color:var(--red)">›</span> Restricted/high-risk industry for that funder</li>
+        </ul>
+      </div>
+      <button class="btn btn-gold" onclick="completeDay(9)">Mark Day 9 Complete →</button>
+    </div>
+
+    <!-- DAY 10 -->
+    <div class="module" id="day10">
+      <div class="module-header">
+        <div class="module-eyebrow">Day 10 — Operations</div>
+        <div class="module-title">Pipeline &amp; Mindset</div>
+        <div class="module-subtitle">Reps who can't manage their pipeline don't last 30 days. Reps who can't manage their mindset don't last 60. Master both.</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📊</span> Pipeline Stage Definitions</div>
+        <ul class="concept-list">
+          <li><span class="concept-bullet">1</span><div><strong>New Lead</strong> — contact info only. No conversation yet.</div></li>
+          <li><span class="concept-bullet">2</span><div><strong>Contacted</strong> — reached decision-maker, had initial conversation.</div></li>
+          <li><span class="concept-bullet">3</span><div><strong>Qualified</strong> — confirmed TIB, revenue, position status. Real prospect.</div></li>
+          <li><span class="concept-bullet">4</span><div><strong>Docs Requested</strong> — asked for bank statements and application.</div></li>
+          <li><span class="concept-bullet">5</span><div><strong>Submitted</strong> — full package sent to funder.</div></li>
+          <li><span class="concept-bullet">6</span><div><strong>Approved</strong> — offer received from funder. Presenting to merchant.</div></li>
+          <li><span class="concept-bullet">7</span><div><strong>Funded</strong> — deal closed. Wire hit. Merchant is a client.</div></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">📅</span> Follow-Up Cadence</div>
+        <div class="formula">Day 0:   Initial call → follow-up text/email within 2 hours
+Day 1:   Follow-up call if no response
+Day 3:   Second follow-up — try different channel (email vs call)
+Day 7:   "Just checking in" — keep it short and human
+Day 14:  Final value-add touch — share relevant info or offer
+Day 30+: Long-term nurture — monthly check-in list</div>
+        <div class="tip-box"><p><strong>The rule:</strong> The fortune is in the follow-up, but the relationship is in the tone. Never sound desperate. Always sound like you're <em>checking in</em>, not chasing.</p></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="icon">🧠</span> Mindset Rules for MCA Sales</div>
+        <ul class="concept-list">
+          <li><span class="concept-bullet">›</span><div><strong>Volume creates luck.</strong> The reps who make 100 dials a day aren't luckier — they just create more chances.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>No is just not yet.</strong> A declined deal today is a funded deal in 3 months. Stay in touch.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>Your reputation is your book.</strong> One happy merchant refers three. One burned merchant tells ten.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>Track everything.</strong> Dials, contacts, qualifieds, submits, approvals, fundings. Know your conversion ratios cold.</div></li>
+          <li><span class="concept-bullet">›</span><div><strong>Outwork the slump.</strong> Every rep hits a cold streak. The ones who survive dial through it.</div></li>
+        </ul>
+      </div>
+      <div class="day-complete-banner show">
+        <h3>🏆 TRAINING COMPLETE</h3>
+        <p>You've covered 10 days of MCA foundation. Check out the Assisting Documents reference tab for scripts, terms, and lender tiers. Now go make dials.</p>
+      </div>
+      <button class="btn btn-gold" onclick="completeDay(10)">Complete Training ✓</button>
+    </div>
+
+    <!-- DAY 11: ASSISTING DOCUMENTS -->
+    <div class="module" id="day11">
+      <div class="module-header">
+        <div class="module-eyebrow">Reference — Operations</div>
+        <div class="module-title">Assisting Documents</div>
+        <div class="module-subtitle">Your reference library. Opening scripts for every lead type, a full MCA glossary, and a breakdown of every lender tier in the market.</div>
+      </div>
+
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab(this,'ref-scripts')">Opening Scripts</button>
+        <button class="tab-btn" onclick="switchTab(this,'ref-terms')">MCA Terms Glossary</button>
+        <button class="tab-btn" onclick="switchTab(this,'ref-tiers')">Lender Tiers</button>
+      </div>
+
+      <!-- SCRIPTS TAB -->
+      <div class="tab-content active" id="ref-scripts">
+
+        <div class="script-block">
+          <div class="script-header">
+            <span class="script-tag tag-dialer">Dialer Lead</span>
+            <span class="script-title">Outbound Dialer — No Prior Contact</span>
+          </div>
+          <div class="script-body">Rep:  "Hey, is this [First Name]? … Hey [First Name], this is [Your Name] calling from [Company].
+       Real quick — our system flagged your business as potentially qualifying for working
+       capital up to $100,000. I know you probably get these calls — I'll keep it short.
+       You been in business over a year?"
+
+[If yes] → "And you're doing at least $10,000 a month through the business?"
+
+[If yes] → "Perfect. We can usually get a decision back same day — sometimes within a
+       couple hours. Is capital something you've thought about lately or not really on
+       your radar right now?"</div>
+          <div class="script-note">💡 Key: Two quick qualifying softballs first. Gets them saying "yes" before you ask anything real. Keeps energy up.</div>
+        </div>
+
+        <div class="script-block">
+          <div class="script-header">
+            <span class="script-tag tag-inbound">Fresh Inbound</span>
+            <span class="script-title">Fresh Lead — Application + Statements Already Submitted</span>
+          </div>
+          <div class="script-body">Rep:  "Hey [First Name], this is [Your Name] from [Company]. I'm calling because you
+       submitted an application with us — I just pulled it up and wanted to personally
+       reach out.
+
+       First off — appreciate you taking the time to submit. I had a chance to take a
+       quick look and it looks like you may qualify for somewhere in the range of
+       $75,000 to $100,000. I wanted to go over a couple of quick details with you to
+       get you the most accurate number.
+
+       Do you have two minutes right now?"</div>
+          <div class="script-note">💡 Key: Personalize immediately. Reference the submission. Give a dollar range early — it creates anchoring and keeps them engaged. "Two minutes" is a low-commitment ask.</div>
+        </div>
+
+        <div class="script-block">
+          <div class="script-header">
+            <span class="script-tag tag-email">Email Blast Lead</span>
+            <span class="script-title">Callback — Responded to Email / Web Form</span>
+          </div>
+          <div class="script-body">Rep:  "Hey [First Name], this is [Your Name] with [Company]. You filled out a form on
+       our site about business funding — I wanted to make sure I reached out personally
+       rather than just sending an automated email.
+
+       I see you're in [industry/city if known] — we work with a lot of [industry]
+       businesses. The process is really straightforward: I ask you about 4 quick
+       questions, and if you qualify, we can usually get you an offer within a few hours.
+
+       Is now an okay time or is there a better time today?"</div>
+          <div class="script-note">💡 Key: Acknowledge the form submission — it differentiates you from a random cold call. Use any data you have from the form (industry, location) to show personalization.</div>
+        </div>
+
+        <div class="script-block">
+          <div class="script-header">
+            <span class="script-tag tag-cold">Pure Cold Call</span>
+            <span class="script-title">Zero Prior Contact — No Lead Source</span>
+          </div>
+          <div class="script-body">Rep:  "Hey [First Name], I'll be upfront with you — this is a cold call, so feel free
+       to tell me to kick rocks if it's not relevant.
+
+       My name is [Your Name], I'm with [Company]. We help small business owners access
+       working capital fast — we're talking decisions in hours, not weeks like a bank.
+       No collateral, no long applications.
+
+       I don't know if that's something that's ever crossed your mind, but I figured
+       it was worth 30 seconds. What kind of business are you running over there?"</div>
+          <div class="script-note">💡 Key: Radical honesty about it being a cold call builds immediate credibility. Ending with a question about their business gets them talking about themselves — the easiest thing anyone does.</div>
+        </div>
+
+        <div class="script-block">
+          <div class="script-header">
+            <span class="script-tag tag-dialer">Dialer Lead</span>
+            <span class="script-title">Second Attempt — Left Voicemail Previously</span>
+          </div>
+          <div class="script-body">Rep:  "Hey [First Name], this is [Your Name] again from [Company] — I left you a
+       voicemail [yesterday / earlier this week], didn't want you to think I disappeared.
+
+       I know you're probably busy running the business — just wanted to circle back
+       because the offer window I mentioned is still open. If the timing was just bad
+       last time, no worries at all — I just want to make sure you at least had a
+       chance to hear what we can do.
+
+       Still have two minutes?"</div>
+          <div class="script-note">💡 Key: Reference the prior voicemail — shows persistence without being creepy. "Offer window" creates soft urgency. Acknowledge their busy schedule — it's respectful.</div>
+        </div>
+
+        <div class="script-block">
+          <div class="script-header">
+            <span class="script-tag tag-voicemail">Voicemail Script</span>
+            <span class="script-title">Voicemail — When You Don't Reach Them</span>
+          </div>
+          <div class="script-body">Rep:  "Hey [First Name], this is [Your Name] with [Company] — quick voicemail.
+       We work with business owners in [industry/area] and based on what I see,
+       you may qualify for up to $100,000 in working capital. Decision same day,
+       no collateral required.
+
+       If that's even remotely interesting, give me a call back at [number] —
+       I'll keep it short. Again, [Your Name], [Company], [number]. Talk soon."</div>
+          <div class="script-note">💡 Key: Under 20 seconds. Give a number. Create curiosity — don't explain everything. Repeat your name and number at the end. Never leave more than 2 voicemails total.</div>
+        </div>
+
+        <div class="script-block">
+          <div class="script-header">
+            <span class="script-tag tag-inbound">Renewal / Repeat</span>
+            <span class="script-title">Existing Client — Renewal Outreach</span>
+          </div>
+          <div class="script-body">Rep:  "Hey [First Name], it's [Your Name] — how's everything going with the business?
+
+       I was looking at your account and it looks like you're about [50–60%] paid
+       down on your advance. A lot of our clients at this stage actually renew early
+       — it lets you access fresh capital while keeping the daily payments roughly
+       the same.
+
+       I wanted to reach out before someone else did — you've been a great client
+       and I want to make sure we take care of you first. Want me to run some
+       numbers real quick?"</div>
+          <div class="script-note">💡 Key: Warm tone — this is a relationship call, not a sales call. Mention the paydown percentage to show you know their account. "Before someone else did" creates loyalty urgency without being pushy.</div>
+        </div>
+
+        <div class="script-block">
+          <div class="script-header">
+            <span class="script-tag tag-cold">Gatekeeper Bridge</span>
+            <span class="script-title">Getting the Owner's Name / Direct Line</span>
+          </div>
+          <div class="script-body">Rep:  "Hi there — who am I speaking with? … [Name], great. I was hoping you could
+       help me out. I'm trying to reach the owner or whoever handles the financial
+       side of the business. Is that someone you could connect me with, or let me
+       know the best time to reach them?
+
+       I appreciate it — what's the owner's first name, just so I'm not going in cold?"</div>
+          <div class="script-note">💡 Key: Ask the gatekeeper for their name first — shows respect. Frame yourself as needing their help (not just demanding transfer). Getting the owner's first name is gold — use it immediately on the real call.</div>
+        </div>
+
+      </div>
+
+      <!-- TERMS TAB -->
+      <div class="tab-content" id="ref-terms">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title"><span class="icon">📖</span> MCA Terms Glossary — Know Every Term Cold</div>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Every term a merchant, underwriter, or funder might use. If someone says it, you know what it means.</p>
+        </div>
+
+        <div class="terms-grid">
+          <div class="term-card"><div class="term-name">Advance Amount</div><div class="term-def">The gross dollar amount funded to the merchant upfront. Also called "funded amount" or "purchase price."</div></div>
+          <div class="term-card"><div class="term-name">Factor Rate</div><div class="term-def">A decimal multiplier (e.g., 1.35) applied to the advance to calculate total payback. NOT an interest rate. Does not compound.</div></div>
+          <div class="term-card"><div class="term-name">Payback Amount</div><div class="term-def">The total amount the merchant must repay. Calculated as: Advance × Factor Rate. On $100k at 1.35 = $135,000.</div></div>
+          <div class="term-card"><div class="term-name">Cost of Capital</div><div class="term-def">The difference between payback and advance. On $100k at 1.35 = $35,000 cost. What the merchant actually "pays" for the money.</div></div>
+          <div class="term-card"><div class="term-name">Daily Payment (ACH)</div><div class="term-def">Fixed dollar amount debited from the merchant's bank account each business day. Most common repayment method.</div></div>
+          <div class="term-card"><div class="term-name">Split Withholding</div><div class="term-def">A percentage of daily credit card deposits withheld for repayment. Fluctuates with revenue. Used when merchant processes cards.</div></div>
+          <div class="term-card"><div class="term-name">Estimated Term</div><div class="term-def">Projected number of months to pay off the advance based on current revenue. NOT a fixed term like a loan.</div></div>
+          <div class="term-card"><div class="term-name">Average Daily Balance (ADB)</div><div class="term-def">The average end-of-day balance in the merchant's business account over the last 1–3 months. Primary UW metric.</div></div>
+          <div class="term-card"><div class="term-name">NSF (Non-Sufficient Funds)</div><div class="term-def">A returned debit or check due to insufficient funds. Multiple NSFs signal cash flow stress and are a major underwriting red flag.</div></div>
+          <div class="term-card"><div class="term-name">Negative Days</div><div class="term-def">Calendar days when the business bank account balance fell below zero. Underwriters count these per month.</div></div>
+          <div class="term-card"><div class="term-name">Stacking</div><div class="term-def">When a merchant takes multiple MCA positions simultaneously from different funders. Considered high risk and often leads to default.</div></div>
+          <div class="term-card"><div class="term-name">Position</div><div class="term-def">A single active MCA agreement. A merchant with two MCAs has "two positions." Also called an "advance" or "deal."</div></div>
+          <div class="term-card"><div class="term-name">Payoff / Balance</div><div class="term-def">The remaining amount owed on an active MCA. Used when calculating renewals or payoffs for consolidation.</div></div>
+          <div class="term-card"><div class="term-name">Renewal</div><div class="term-def">When an existing MCA client receives a new advance, typically once 40–60% of the prior advance is paid down.</div></div>
+          <div class="term-card"><div class="term-name">Consolidation</div><div class="term-def">Paying off one or more existing MCA positions and replacing with a new single advance. Simplifies payments for the merchant.</div></div>
+          <div class="term-card"><div class="term-name">Time in Business (TIB)</div><div class="term-def">How long the business has been operating. Minimum threshold for most funders is 6–12 months.</div></div>
+          <div class="term-card"><div class="term-name">ISO (Independent Sales Org)</div><div class="term-def">A broker or intermediary company that originates MCA deals and submits to funders. Most reps work for an ISO.</div></div>
+          <div class="term-card"><div class="term-name">Funder / Lender</div><div class="term-def">The capital provider that actually deploys the money. ISOs act as the sales arm; funders underwrite and fund deals.</div></div>
+          <div class="term-card"><div class="term-name">Underwriting (UW)</div><div class="term-def">The process by which a funder reviews a submission to determine risk, eligibility, and offer terms.</div></div>
+          <div class="term-card"><div class="term-name">Submission Package</div><div class="term-def">The complete set of documents sent to a funder: application, bank statements, voided check, ID, and any additional docs.</div></div>
+          <div class="term-card"><div class="term-name">Offer / Approval</div><div class="term-def">The funder's response with specific terms: funded amount, factor rate, payback, and daily payment. Not a guarantee until funded.</div></div>
+          <div class="term-card"><div class="term-name">Stipulations (Stips)</div><div class="term-def">Additional documents or conditions required by the funder before funding. Common stips: tax returns, landlord letter, AR aging.</div></div>
+          <div class="term-card"><div class="term-name">Contract / Agreement</div><div class="term-def">The executed MCA agreement signed by the merchant. Outlines all deal terms, rights, and obligations.</div></div>
+          <div class="term-card"><div class="term-name">Funding Date</div><div class="term-def">The date the wire or ACH is sent to the merchant's account. The deal closes on this date.</div></div>
+          <div class="term-card"><div class="term-name">Wire / ACH Funding</div><div class="term-def">The method of transferring funds to the merchant. Wires are same-day; ACH typically next business day.</div></div>
+          <div class="term-card"><div class="term-name">Commission / Points</div><div class="term-def">The rep's compensation, calculated as a percentage of the advance amount or as "points." E.g., 5 points on $100k = $5,000.</div></div>
+          <div class="term-card"><div class="term-name">Buy Rate</div><div class="term-def">The minimum factor rate at which the funder will approve a deal. The ISO can mark up above buy rate to increase commission.</div></div>
+          <div class="term-card"><div class="term-name">Markup</div><div class="term-def">The difference between the buy rate and the rate quoted to the merchant. Adds to the ISO's/rep's commission.</div></div>
+          <div class="term-card"><div class="term-name">Chargeback</div><div class="term-def">A clawback of commission from the rep/ISO if the merchant defaults early in the advance (usually within 60–90 days).</div></div>
+          <div class="term-card"><div class="term-name">Default</div><div class="term-def">When a merchant stops making payments on an active MCA. Can trigger confession of judgment (COJ) in some states.</div></div>
+          <div class="term-card"><div class="term-name">Confession of Judgment (COJ)</div><div class="term-def">A legal clause allowing the funder to obtain a court judgment without a full trial if the merchant defaults. Now restricted in many states.</div></div>
+          <div class="term-card"><div class="term-name">Personal Guarantee (PG)</div><div class="term-def">Agreement by the business owner to be personally liable for the advance if the business defaults.</div></div>
+          <div class="term-card"><div class="term-name">UCC Filing</div><div class="term-def">Uniform Commercial Code lien filed against the merchant's business assets by the funder. Signals an active MCA when checked.</div></div>
+          <div class="term-card"><div class="term-name">UCC Search</div><div class="term-def">A check of UCC filings to identify existing MCA positions before submitting a new deal. Critical for due diligence.</div></div>
+          <div class="term-card"><div class="term-name">Gross Revenue</div><div class="term-def">Total deposits into the business account before deducting expenses. The primary metric funders use to determine advance size.</div></div>
+          <div class="term-card"><div class="term-name">Net Revenue</div><div class="term-def">Revenue minus expenses. Less commonly used than gross in MCA underwriting, but relevant for higher-tier funders.</div></div>
+          <div class="term-card"><div class="term-name">Monthly Gross Revenue (MGR)</div><div class="term-def">Average monthly deposits over the last 3–6 months. Advance amount typically ranges 75%–150% of MGR depending on tier.</div></div>
+          <div class="term-card"><div class="term-name">Debt Service Coverage (DSC)</div><div class="term-def">How much free cash flow remains after all debt payments. Higher-tier funders calculate this. Lower DSC = tighter terms.</div></div>
+          <div class="term-card"><div class="term-name">Restricted Industries</div><div class="term-def">Business types most funders won't touch: cannabis, firearms, adult entertainment, non-profits, gambling, legal services.</div></div>
+          <div class="term-card"><div class="term-name">Reverse Consolidation</div><div class="term-def">A product where the funder makes one large daily payment to cover multiple MCA positions, then collects a single daily debit from the merchant. Reduces total daily outflow.</div></div>
+          <div class="term-card"><div class="term-name">Bridge Advance</div><div class="term-def">A small short-term advance designed to bridge a merchant until a larger deal is approved or a prior position pays down.</div></div>
+          <div class="term-card"><div class="term-name">Holdback</div><div class="term-def">Percentage of credit card sales withheld for repayment in a split-withholding arrangement. Typically 10–20%.</div></div>
+          <div class="term-card"><div class="term-name">Term Sheet</div><div class="term-def">A document outlining the proposed terms of an MCA offer before the formal contract is signed.</div></div>
+          <div class="term-card"><div class="term-name">Syndication</div><div class="term-def">When multiple funders co-fund a single deal, each providing a portion of the capital and sharing the risk.</div></div>
+        </div>
+      </div>
+
+      <!-- LENDER TIERS TAB -->
+      <div class="tab-content" id="ref-tiers">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title"><span class="icon">🏦</span> Lender Category Breakdown</div>
+          <p style="font-size:13px;color:var(--muted);">Not all funders are the same. Understanding each tier tells you where to submit a deal — and what to expect back. Match the merchant's profile to the right lender tier or you're leaving money on the table.</p>
+        </div>
+
+        <div class="tier-card tier-a">
+          <div class="tier-name">A Paper Lenders</div>
+          <div class="tier-sub">Prime Tier — The Gold Standard</div>
+          <div class="tier-specs">
+            <span class="tier-spec">Factor Rate: 1.10–1.25</span>
+            <span class="tier-spec">TIB: 2+ years</span>
+            <span class="tier-spec">Monthly Revenue: $50k+</span>
+            <span class="tier-spec">Credit: 620+</span>
+            <span class="tier-spec">NSFs: 0–2/month max</span>
+          </div>
+          <ul class="tier-bullets">
+            <li>Best rates in the market. Merchants with clean statements, consistent deposits, and strong revenue history qualify here.</li>
+            <li>Underwriting is thorough — expect to provide tax returns, P&amp;L statements, and possibly business credit reports.</li>
+            <li>Approval takes longer (same day to 24 hours). More stipulations. But the deal terms are the most favorable for the merchant.</li>
+            <li>Typical advance: 1–1.5x monthly gross revenue. $100,000–$500,000+ possible for strong profiles.</li>
+            <li>Examples of merchant profile: established restaurant chain, medical practice, construction company with contracts on file.</li>
+            <li>If your merchant qualifies A Paper, always lead here. Better terms = happier client = referrals.</li>
+          </ul>
+        </div>
+
+        <div class="tier-card tier-b">
+          <div class="tier-name">B Tier Lenders</div>
+          <div class="tier-sub">Standard Tier — The Bread &amp; Butter</div>
+          <div class="tier-specs">
+            <span class="tier-spec">Factor Rate: 1.25–1.38</span>
+            <span class="tier-spec">TIB: 1+ year</span>
+            <span class="tier-spec">Monthly Revenue: $15k+</span>
+            <span class="tier-spec">Credit: 550+</span>
+            <span class="tier-spec">NSFs: Up to 4–5/month</span>
+          </div>
+          <ul class="tier-bullets">
+            <li>The most common tier. Most merchants who have been in business 12+ months with decent statements land here.</li>
+            <li>Underwriting is faster than A Paper — decisions in 1–4 hours. Fewer stips required.</li>
+            <li>Will accept some NSFs, occasional negative days, and moderate existing positions.</li>
+            <li>Typical advance: 75%–125% of monthly gross revenue. Standard terms, standard process.</li>
+            <li>This is where most new reps build their book. Volume play. Consistent performers land deals here daily.</li>
+            <li>Submit here when the merchant is solid but not pristine. Don't force an A-Paper submission on a B-Paper file — it wastes time.</li>
+          </ul>
+        </div>
+
+        <div class="tier-card tier-c">
+          <div class="tier-name">C Tier Lenders</div>
+          <div class="tier-sub">Subprime Tier — The Turnaround Play</div>
+          <div class="tier-specs">
+            <span class="tier-spec">Factor Rate: 1.38–1.49</span>
+            <span class="tier-spec">TIB: 6+ months</span>
+            <span class="tier-spec">Monthly Revenue: $10k+</span>
+            <span class="tier-spec">Credit: 500+</span>
+            <span class="tier-spec">NSFs: Up to 8–10/month</span>
+          </div>
+          <ul class="tier-bullets">
+            <li>For merchants with messy statements, low credit, and a rough last few months — but still operational and making deposits.</li>
+            <li>Higher factor rates. Shorter terms. Lower advance amounts relative to revenue (50%–75% of MGR).</li>
+            <li>Approvals can be same-day but offers are often conditional — small advances to test the merchant first.</li>
+            <li>NSFs, negative days, and low ADB are acceptable but tracked carefully. Existing positions must be minimal.</li>
+            <li>Merchant profile: a newer business, a seasonal business in a tough stretch, or an owner rebuilding after a setback.</li>
+            <li>Don't lead with C Paper unless you've already tried B. But don't let a deal die when C Paper can save it — funded is better than nothing.</li>
+          </ul>
+        </div>
+
+        <div class="tier-card tier-high">
+          <div class="tier-name">High Risk Lenders</div>
+          <div class="tier-sub">Last Resort Tier — High Rate, Last Resort</div>
+          <div class="tier-specs">
+            <span class="tier-spec">Factor Rate: 1.45–1.55+</span>
+            <span class="tier-spec">TIB: 4+ months</span>
+            <span class="tier-spec">Monthly Revenue: $8k+</span>
+            <span class="tier-spec">Credit: 450+</span>
+            <span class="tier-spec">NSFs: 10+/month acceptable</span>
+          </div>
+          <ul class="tier-bullets">
+            <li>Will fund merchants that most other funders pass on: distressed files, high NSF counts, heavy existing positions, low ADB.</li>
+            <li>Factor rates are the highest in the market. Small advance amounts. Short payback windows (3–6 months typical).</li>
+            <li>Underwriting is fast and lenient, but offers are small and expensive. Merchant receives the least favorable terms.</li>
+            <li>Common use case: merchant is in crisis (payroll, taxes, equipment failure) and needs something immediately.</li>
+            <li>Handle with care — transparency is critical. Be honest about the rate and the cost. A merchant who feels misled becomes a chargeback and a complaint.</li>
+            <li>High risk lenders are also sometimes used as bridge funders — getting a merchant stabilized so they can move to a better tier in 3–6 months.</li>
+          </ul>
+        </div>
+
+        <div class="tier-card tier-reverse">
+          <div class="tier-name">Reverse Consolidation Lenders</div>
+          <div class="tier-sub">Specialty Product — Multi-Position Relief</div>
+          <div class="tier-specs">
+            <span class="tier-spec">Factor Rate: 1.10–1.20</span>
+            <span class="tier-spec">Positions: 2–5 active MCAs</span>
+            <span class="tier-spec">Monthly Revenue: $30k+</span>
+            <span class="tier-spec">TIB: 1+ year</span>
+            <span class="tier-spec">Purpose: Cash flow relief</span>
+          </div>
+          <ul class="tier-bullets">
+            <li>Reverse consolidation is NOT a new advance. The lender pays all the merchant's existing MCA positions and the merchant makes one single daily payment back to the reverse lender.</li>
+            <li>The daily payment is lower than the combined payments the merchant was making before. This is the pitch — instant cash flow relief.</li>
+            <li>Lower factor rate than the merchant's existing positions, but the term is extended, so total cost may still be significant.</li>
+            <li>Ideal merchant profile: 2–5 stacked positions, drowning in daily debits, revenue is good but cash flow is strangled.</li>
+            <li>This is a specialty product — not every ISO works with reverse consolidation lenders. Know which funders in your network offer it.</li>
+            <li>The pitch: "You're paying $2,000 a day across three advances right now. We can get that down to one payment of $1,200 a day and give you breathing room." That message sells itself.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="margin-top:24px;">
+          <div class="card-title"><span class="icon">🗺️</span> Quick Tier Selection Guide</div>
+          <table class="obj-table">
+            <tr><th>Merchant Profile</th><th>Start Here</th><th>Backup</th></tr>
+            <tr><td>Clean statements, 2+ years, $50k+/mo revenue</td><td style="color:#7dce9c">A Paper</td><td style="color:var(--gold-light)">B Tier</td></tr>
+            <tr><td>Decent statements, 1+ year, $15k–$50k/mo</td><td style="color:var(--gold-light)">B Tier</td><td style="color:#e07070">C Tier</td></tr>
+            <tr><td>Messy statements, 6–12 months, some NSFs</td><td style="color:#e07070">C Tier</td><td style="color:#c39bd3">High Risk</td></tr>
+            <tr><td>Multiple active positions, cash flow stressed</td><td style="color:#8ab4d4">Reverse Consol.</td><td style="color:#e07070">C Tier</td></tr>
+            <tr><td>Crisis situation, heavy NSFs, last resort</td><td style="color:#c39bd3">High Risk</td><td>Decline + nurture</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div style="margin-top:24px;">
+        <button class="btn btn-gold" onclick="completeDay(11)">Mark Reference Complete ✓</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const completedDays = new Set();
+  let currentDay = 1;
+  let currentScenario = 'cold';
+  let chatHistory = [];
+  let isLoading = false;
+
+  const scenarios = {
+    cold: {
+      label: 'Cold Call — Restaurant Owner',
+      emoji: '🍕',
+      opening: '"Yeah, hello?"',
+      system: `You are Mike, owner of a pizza restaurant in Queens, NY. You've been in business 4 years. You do about $40k/month in revenue. You have no current financing. You're a bit skeptical of cold calls but open if the person seems legit. You're stressed about a kitchen equipment upgrade. You speak casually. Don't be too easy — make the rep work. Respond in 1-3 sentences max. Stay in character. If they're pushy or pitch too fast, push back. If they qualify properly, warm up.`
+    },
+    inbound: {
+      label: 'Inbound — Contractor Needs Cash Fast',
+      emoji: '🔨',
+      opening: '"I filled out your form online — I need money like this week if possible."',
+      system: `You are Carlos, a contractor who submitted an online inquiry. In business 7 years. Revenue $60k/month. You have one existing MCA with $15k remaining. Need $100k for materials on a new job. Motivated but nervous about having two positions. Speak directly. If the rep explains things clearly you'll move forward. If they dodge the existing position question you get suspicious.`
+    },
+    objection: {
+      label: 'Objection — Rate Too High',
+      emoji: '💰',
+      opening: '"Look I saw the terms — 1.4 factor rate? That\'s insane. The bank charges me like 7%."',
+      system: `You are Janet, owner of a boutique retail shop. 3 years in business. $25k/month revenue. No existing positions. Frustrated about MCA pricing, comparing to bank rates. Smart and financially aware. Make the rep work to reframe the cost. If they give a genuine ROI argument and don't get defensive, soften. If they get defensive or use jargon, shut down.`
+    },
+    stacker: {
+      label: 'Red Flag — Potential Stacker',
+      emoji: '⚠️',
+      opening: '"Hey yeah I\'m interested. I\'ve been getting a lot of calls lately — what can you do for me?"',
+      system: `You are Tony, a restaurant owner. You have TWO active MCA positions — $800/day combined going out. Revenue is $35k/month. You're shopping for more money. You won't volunteer the two positions — the rep must ask directly. If they catch it, be a bit defensive then honest. If they don't catch it, keep going along. This is a red flag scenario — the rep should identify the stacking risk and handle it professionally.`
+    }
+  };
+
+  function setScenario(btn, key) {
+    currentScenario = key;
+    document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('scenarioBadge').textContent = scenarios[key].label;
+    resetChat();
+  }
+
+  function resetChat() {
+    chatHistory = [];
+    const s = scenarios[currentScenario];
+    document.getElementById('chatArea').innerHTML = `
+      <div class="msg merchant">
+        <div><div class="msg-label">Merchant</div><div class="msg-avatar">${s.emoji}</div></div>
+        <div><div class="msg-bubble">${s.opening}</div></div>
+      </div>`;
+    document.getElementById('feedbackBox').classList.remove('show');
+    document.getElementById('repInput').value = '';
+    chatHistory.push({ role: 'user', content: '[SCENARIO START] The sales rep is about to respond to your opening line. Respond naturally as the merchant.' });
+    chatHistory.push({ role: 'assistant', content: s.opening });
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  }
+
+  async function sendMessage() {
+    if (isLoading) return;
+    const input = document.getElementById('repInput');
+    const text = input.value.trim();
+    if (!text) return;
+
+    const chatArea = document.getElementById('chatArea');
+    chatArea.innerHTML += `
+      <div class="msg rep">
+        <div><div class="msg-label" style="text-align:right">You (Rep)</div><div class="msg-avatar">💼</div></div>
+        <div><div class="msg-bubble">${escapeHtml(text)}</div></div>
+      </div>`;
+    input.value = '';
+    chatHistory.push({ role: 'user', content: text });
+
+    isLoading = true;
+    document.getElementById('sendBtn').disabled = true;
+    const loadId = 'load_' + Date.now();
+    chatArea.innerHTML += `<div class="msg merchant" id="${loadId}">
+      <div><div class="msg-avatar">${scenarios[currentScenario].emoji}</div></div>
+      <div><div class="msg-bubble"><div class="loading-dots"><span></span><span></span><span></span></div></div></div>
+    </div>`;
+    chatArea.scrollTop = chatArea.scrollHeight;
+
+    try {
+      const s = scenarios[currentScenario];
+      const merchantRes = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 200,
+          system: s.system,
+          messages: chatHistory
+        })
+      });
+
+      if (!merchantRes.ok) {
+        const errData = await merchantRes.json().catch(() => ({}));
+        throw new Error(errData.error?.message || `HTTP ${merchantRes.status}`);
+      }
+
+      const merchantData = await merchantRes.json();
+      const merchantReply = merchantData.content.map(c => c.text || '').join('');
+
+      document.getElementById(loadId)?.remove();
+      chatArea.innerHTML += `
+        <div class="msg merchant">
+          <div><div class="msg-label">Merchant</div><div class="msg-avatar">${s.emoji}</div></div>
+          <div><div class="msg-bubble">${escapeHtml(merchantReply)}</div></div>
+        </div>`;
+      chatHistory.push({ role: 'assistant', content: merchantReply });
+
+      // Coach feedback — separate call
+      const lastMerchantLine = chatHistory.length >= 4 ? chatHistory[chatHistory.length - 4]?.content : s.opening;
+      const coachRes = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 200,
+          system: `You are an expert MCA sales coach. Review the trainee's response during a live roleplay drill. Be direct, specific, and constructive. In 2-4 sentences: what did they do well, what did they miss, and one specific thing to do differently next time. Scenario: ${s.label}`,
+          messages: [{ role: 'user', content: `Merchant said: "${lastMerchantLine}"\nRep responded: "${text}"\nMerchant replied: "${merchantReply}"\n\nCoach feedback:` }]
+        })
+      });
+
+      if (coachRes.ok) {
+        const coachData = await coachRes.json();
+        const coachText = coachData.content.map(c => c.text || '').join('');
+        document.getElementById('feedbackTitle').textContent = '🎯 Coach Feedback';
+        document.getElementById('feedbackText').textContent = coachText;
+        document.getElementById('feedbackBox').className = 'feedback-box show';
+      }
+
+    } catch (err) {
+      document.getElementById(loadId)?.remove();
+      chatArea.innerHTML += `<div style="font-size:12px;color:var(--red);padding:8px 0;">⚠️ Error: ${escapeHtml(err.message)}. Try typing your response again.</div>`;
+    }
+
+    isLoading = false;
+    document.getElementById('sendBtn').disabled = false;
+    chatArea.scrollTop = chatArea.scrollHeight;
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function goDay(n) {
+    document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach((m, i) => { if (i === n-1) m.classList.add('active'); else m.classList.remove('active'); });
+    document.getElementById('day' + n).classList.add('active');
+    currentDay = n;
+    updateProgress();
+    if (n === 8) resetChat();
+  }
+
+  function completeDay(n) {
+    completedDays.add(n);
+    document.getElementById('chk' + n).textContent = '✓';
+    document.querySelectorAll('.nav-item')[n - 1].classList.add('completed');
+    updateProgress();
+    if (n < 11) setTimeout(() => goDay(n + 1), 400);
+  }
+
+  function updateProgress() {
+    const pct = Math.max(9, Math.round((completedDays.size / 11) * 100));
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = completedDays.size === 11 ? 'Complete!' : `Day ${currentDay}`;
+  }
+
+  function switchTab(btn, id) {
+    const parent = btn.closest('.module');
+    parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(id).classList.add('active');
+  }
+
+  function answer(el, type) {
+    if (el.classList.contains('disabled')) return;
+    const group = el.closest('.quiz-options');
+    group.querySelectorAll('.quiz-option').forEach(o => {
+      o.classList.add('disabled');
+      if (o === el) o.classList.add(type);
+    });
+  }
+
+  function toggleCheck(li) { li.classList.toggle('done'); }
+
+  resetChat();
+</script>
+</body>
+</html>
