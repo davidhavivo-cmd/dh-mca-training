@@ -162,11 +162,177 @@
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: var(--surface); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* ── HAMBURGER MENU (hidden on desktop) ── */
+  .hamburger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .hamburger-btn span {
+    display: block;
+    width: 18px;
+    height: 2px;
+    background: var(--gold);
+    margin: 0 auto;
+    border-radius: 1px;
+  }
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 199;
+  }
+  .sidebar-overlay.show { display: block; }
+
+  /* ══════════════════════════════════════ */
+  /* ── MOBILE / TABLET RESPONSIVE STYLES ── */
+  /* ══════════════════════════════════════ */
+  @media (max-width: 860px) {
+    .hamburger-btn { display: flex; }
+
+    .header {
+      padding: 0 12px;
+      gap: 10px;
+      height: 56px;
+    }
+    .header-logo { font-size: 17px; letter-spacing: 1px; }
+    .header-sub { display: none; }
+    .header-right { gap: 8px; }
+    .progress-label { display: none; }
+    .progress-bar-wrap { width: 60px; }
+
+    .layout { display: block; }
+
+    .sidebar {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      bottom: 0;
+      width: 78%;
+      max-width: 320px;
+      z-index: 200;
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      box-shadow: 4px 0 24px rgba(0,0,0,0.5);
+      height: calc(100vh - 56px);
+    }
+    .sidebar.open { transform: translateX(0); }
+
+    .main {
+      padding: 16px;
+      max-width: 100%;
+    }
+
+    .module-title { font-size: 32px; letter-spacing: 1px; }
+    .module-subtitle { font-size: 13px; }
+    .module-eyebrow { font-size: 10px; }
+    .module-header { margin-bottom: 20px; }
+
+    .card { padding: 16px; margin-bottom: 14px; }
+    .card-title { font-size: 12px; }
+
+    /* Stack any side-by-side grids */
+    .stats-row { flex-wrap: wrap; gap: 10px; }
+    .stat-box { min-width: 45%; }
+    .stat-number { font-size: 26px; }
+
+    /* Deal Builder grid → single column */
+    div[style*="grid-template-columns:1fr 1fr"] {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* Tables → horizontal scroll */
+    .obj-table { display: block; overflow-x: auto; white-space: nowrap; }
+    .obj-table th, .obj-table td { white-space: normal; min-width: 140px; }
+    .obj-table td:first-child, .obj-table th:first-child { min-width: 110px; }
+
+    /* Terms glossary grid → single column */
+    .terms-grid { grid-template-columns: 1fr; }
+
+    /* Tab nav becomes horizontally scrollable */
+    .tab-nav {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      flex-wrap: nowrap;
+      padding-bottom: 2px;
+    }
+    .tab-btn {
+      flex-shrink: 0;
+      padding: 10px 14px;
+      font-size: 11px;
+    }
+
+    /* Scenario selector wraps tighter */
+    .scenario-selector { gap: 6px; }
+    .scenario-btn { font-size: 11px; padding: 6px 12px; }
+
+    /* Roleplay chat area */
+    .chat-area { min-height: 240px; max-height: 320px; }
+    .msg { max-width: 92%; }
+    .roleplay-top { flex-wrap: wrap; gap: 8px; padding: 12px 14px; }
+    .scenario-badge { font-size: 10px; }
+    .chat-input-area { flex-direction: column; gap: 10px; padding: 12px 14px; }
+    .chat-input-area .btn { width: 100%; }
+
+    /* Lender tier specs wrap better */
+    .tier-specs { gap: 6px; }
+    .tier-spec { font-size: 10px; padding: 4px 10px; }
+    .tier-name { font-size: 18px; }
+
+    /* Formula blocks scroll horizontally if needed */
+    .formula { font-size: 12px; padding: 12px 14px; overflow-x: auto; }
+
+    /* Score display in coach feedback - scale down */
+    #feedbackText > div:first-child { gap: 14px !important; flex-wrap: wrap; }
+    #feedbackText > div:first-child > div:first-child { font-size: 48px !important; }
+    #feedbackText > div:first-child > div:last-child > div:first-child { font-size: 30px !important; }
+    #feedbackBox { padding: 14px 16px !important; }
+
+    /* Deal builder inputs */
+    #day12 input, #day12 select { font-size: 15px; }
+
+    /* Cert exam result */
+    #cert-score-display { font-size: 56px !important; }
+    #cert-grade-display { font-size: 28px !important; }
+    #cert-badge { padding: 20px !important; max-width: 100% !important; }
+
+    /* Quiz options larger tap targets */
+    .quiz-option { padding: 14px 16px; font-size: 13px; }
+
+    /* Checklist larger tap targets */
+    .checklist li { padding: 12px 0; }
+
+    /* Day complete banner */
+    .day-complete-banner h3 { font-size: 22px; }
+    .day-complete-banner p { font-size: 12px; }
+  }
+
+  @media (max-width: 480px) {
+    .module-title { font-size: 26px; }
+    .stat-box { min-width: 100%; }
+    .header-logo { font-size: 15px; }
+    .progress-bar-wrap { width: 44px; }
+    #progressText { font-size: 10px !important; }
+  }
 </style>
 </head>
 <body>
 
 <div class="header">
+  <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
   <div>
     <div class="header-logo">DH-MCA TRAINING</div>
     <div class="header-sub">Sales Training System — Days 1 through 10</div>
@@ -179,6 +345,7 @@
     <span style="font-size:12px;color:var(--muted)" id="progressText">Day 1</span>
   </div>
 </div>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <div class="layout">
   <div class="sidebar">
@@ -1941,6 +2108,20 @@ THAT is your pitch. Lead with the savings, then the capital.</div>
     updateProgress();
     if (n === 8) resetChat();
     if (n === 12) setTimeout(calcDeal, 50);
+    closeSidebarMobile();
+    window.scrollTo(0, 0);
+  }
+
+  function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('open');
+    document.querySelector('.sidebar-overlay').classList.toggle('show');
+  }
+
+  function closeSidebarMobile() {
+    if (window.innerWidth <= 860) {
+      document.querySelector('.sidebar').classList.remove('open');
+      document.querySelector('.sidebar-overlay').classList.remove('show');
+    }
   }
 
   function completeDay(n) {
