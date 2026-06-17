@@ -142,6 +142,141 @@
     taOptions = null;
   }
 
+  // TEXTASSIST PLUS
+  var tapOptions = null;
+
+  function tapSaveSettings() {
+    var settings = {
+      company: document.getElementById('tap-company').value,
+      repname: document.getElementById('tap-repname').value,
+      speed: document.getElementById('tap-speed').value,
+      range: document.getElementById('tap-range').value,
+      rates: document.getElementById('tap-rates').value,
+      tone: document.getElementById('tap-tone').value,
+      custom: document.getElementById('tap-custom').value
+    };
+    localStorage.setItem('tap_settings', JSON.stringify(settings));
+    document.getElementById('tap-saved-dot').style.display = 'inline-block';
+    document.getElementById('tap-saved-label').style.display = 'inline';
+    setTimeout(function() {
+      document.getElementById('tap-saved-dot').style.display = 'none';
+      document.getElementById('tap-saved-label').style.display = 'none';
+    }, 1500);
+  }
+
+  function tapLoadSettings() {
+    try {
+      var raw = localStorage.getItem('tap_settings');
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      if (s.company) document.getElementById('tap-company').value = s.company;
+      if (s.repname) document.getElementById('tap-repname').value = s.repname;
+      if (s.speed) document.getElementById('tap-speed').value = s.speed;
+      if (s.range) document.getElementById('tap-range').value = s.range;
+      if (s.rates) document.getElementById('tap-rates').value = s.rates;
+      if (s.tone) document.getElementById('tap-tone').value = s.tone;
+      if (s.custom) document.getElementById('tap-custom').value = s.custom;
+    } catch(e) {}
+  }
+
+  function tapToggleSettings() {
+    var body = document.getElementById('tap-settings-body');
+    var btn = document.getElementById('tap-settings-toggle');
+    if (body.style.display === 'none') {
+      body.style.display = 'flex';
+      btn.textContent = 'Hide';
+    } else {
+      body.style.display = 'none';
+      btn.textContent = 'Show Settings';
+    }
+  }
+
+  async function tapGenerate() {
+    var merchant = document.getElementById('tap-merchant').value.trim();
+    var msg = document.getElementById('tap-msg').value.trim();
+    if (!merchant || !msg) { alert('Please enter merchant name and their message.'); return; }
+
+    var company = document.getElementById('tap-company').value.trim() || 'our company';
+    var repname = document.getElementById('tap-repname').value.trim() || 'the rep';
+    var speed = document.getElementById('tap-speed').value.trim() || 'fast approval and funding';
+    var range = document.getElementById('tap-range').value.trim() || 'various amounts';
+    var rates = document.getElementById('tap-rates').value.trim() || 'competitive rates';
+    var tone = document.getElementById('tap-tone').value || 'balanced';
+    var custom = document.getElementById('tap-custom').value.trim();
+    var industry = document.getElementById('tap-industry').value.trim();
+    var revenue = document.getElementById('tap-revenue').value.trim();
+    var positions = document.getElementById('tap-positions').value;
+    var purpose = document.getElementById('tap-purpose').value.trim();
+
+    var context = 'Company: ' + company + '. Rep name: ' + repname + '. Funding speed: ' + speed + '. Funding range: ' + range + '. Factor rates: ' + rates + '. Tone: ' + tone + '.';
+    if (industry) context += ' Merchant industry: ' + industry + '.';
+    if (revenue) context += ' Monthly revenue: ' + revenue + '.';
+    if (positions !== 'none') context += ' Existing MCA positions: ' + positions + '.';
+    if (purpose) context += ' Capital needed for: ' + purpose + '.';
+    if (custom) context += ' Additional context: ' + custom;
+
+    document.getElementById('tap-results').style.display = 'none';
+    document.getElementById('tap-loading').style.display = 'block';
+    document.getElementById('tap-btn').disabled = true;
+
+    try {
+      var res = await fetch('/.netlify/functions/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 1000,
+          system: 'You are an expert MCA sales coach helping a rep respond to a merchant text. Use the company context provided to give accurate, specific responses. Return ONLY valid JSON: {"soft":{"label":"2-4 words","message":"reply text","note":"why it works"},"direct":{"label":"2-4 words","message":"reply text","note":"why it works"},"close":{"label":"2-4 words","message":"reply text","note":"why it works"}}. Use the actual company name, rep name, rates, and funding speed in the responses where relevant. Keep replies conversational and text-appropriate. Soft=builds rapport. Direct=answers clearly and advances. Close=creates urgency or asks for commitment.',
+          messages: [{ role: 'user', content: context + ' Merchant name: ' + merchant + '. Their text: ' + msg + '. Generate 3 responses.' }]
+        })
+      });
+      var data = await res.json();
+      var raw = data.content.map(function(c) { return c.text || ''; }).join('');
+      var parsed = JSON.parse(raw.replace(/```json|```/g, '').trim());
+      tapOptions = parsed;
+      document.getElementById('tap-label-a').textContent = parsed.soft.label;
+      document.getElementById('tap-text-a').textContent = parsed.soft.message;
+      document.getElementById('tap-note-a').textContent = parsed.soft.note;
+      document.getElementById('tap-label-b').textContent = parsed.direct.label;
+      document.getElementById('tap-text-b').textContent = parsed.direct.message;
+      document.getElementById('tap-note-b').textContent = parsed.direct.note;
+      document.getElementById('tap-label-c').textContent = parsed.close.label;
+      document.getElementById('tap-text-c').textContent = parsed.close.message;
+      document.getElementById('tap-note-c').textContent = parsed.close.note;
+      document.getElementById('tap-loading').style.display = 'none';
+      document.getElementById('tap-results').style.display = 'block';
+    } catch(e) {
+      document.getElementById('tap-loading').style.display = 'none';
+      alert('Error: ' + e.message);
+    }
+    document.getElementById('tap-btn').disabled = false;
+  }
+
+  function tapCopy(opt) {
+    if (!tapOptions) return;
+    var map = { a: tapOptions.soft, b: tapOptions.direct, c: tapOptions.close };
+    var el = document.createElement('textarea');
+    el.value = map[opt].message;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    var toast = document.getElementById('tap-toast');
+    toast.style.display = 'block';
+    setTimeout(function() { toast.style.display = 'none'; }, 2000);
+  }
+
+  function tapReset() {
+    document.getElementById('tap-results').style.display = 'none';
+    document.getElementById('tap-msg').value = '';
+    document.getElementById('tap-merchant').value = '';
+    document.getElementById('tap-industry').value = '';
+    document.getElementById('tap-revenue').value = '';
+    document.getElementById('tap-purpose').value = '';
+    document.getElementById('tap-positions').value = 'none';
+    tapOptions = null;
+  }
+
   function resetChat() {
     chatHistory = [];
     const s = scenarios[currentScenario];
@@ -361,7 +496,7 @@
     currentDay = n;
     updateProgress();
     if (n === 8) resetChat();
-    if (n === 12) setTimeout(calcDeal, 50);
+    if (n === 12) setTimeout(calcDeal, 50); if (n === 25) setTimeout(tapLoadSettings, 50);
     if (n === 24) setTimeout(taInit, 50);
     closeSidebarMobile();
     window.scrollTo(0, 0);
