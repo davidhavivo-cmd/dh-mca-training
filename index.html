@@ -56,7 +56,7 @@
     <div class="nav-item" onclick="goDay(20)"><span class="nav-day">D18</span> Consolidation Strategy<span class="nav-check" id="chk20"></span></div>
     <div class="nav-item" onclick="goDay(21)"><span class="nav-day">D19</span> Industry Deep Dives<span class="nav-check" id="chk21"></span></div>
     <div class="nav-item" onclick="goDay(22)"><span class="nav-day">D20</span> Your Sales System<span class="nav-check" id="chk22"></span></div>
-    <div class="nav-item" onclick="goDay(23)" style="border-left:2px solid var(--gold)"><span class="nav-day" style="color:var(--gold)">&#127942;</span> <span style="color:var(--gold-light);font-weight:700">Certification Exam</span><span class="nav-check" id="chk23"></span></div>
+
     <div class="sidebar-section">Tools</div>
     <div class="nav-item" onclick="goDay(24)" style="border-left:2px solid #4a9ede"><span class="nav-day" style="color:#4a9ede">&#128172;</span> <span style="color:#8ab4d4;font-weight:700">TextAssist</span><span class="nav-check" id="chk24"></span></div>
   </div>
@@ -1252,136 +1252,6 @@ THAT is your pitch. Lead with the savings, then the capital.</div>
         <p>You've completed all 20 days. Now take the certification exam to earn your DH-MCA certification.</p>
       </div>
       <button class="btn btn-gold" onclick="completeDay(22);setTimeout(()=>goDay(23),500)">Complete Day 20 &amp; Take Exam &#8594;</button>
-    </div>
-
-    <!-- DAY 23: CERTIFICATION EXAM -->
-    <div class="module" id="day23">
-      <div class="module-header">
-        <div class="module-eyebrow">&#127942; Final Assessment</div>
-        <div class="module-title">Certification Exam</div>
-        <div class="module-subtitle">15 questions across all 20 days. You need 80% to pass. One shot &#8212; make it count.</div>
-      </div>
-
-      <div id="cert-start">
-        <div class="card">
-          <div class="card-title"><span class="icon">&#128203;</span> Exam Rules</div>
-          <ul class="concept-list">
-            <li><span class="concept-bullet">&#8250;</span> 15 multiple choice questions drawn from Days 1&#8211;20</li>
-            <li><span class="concept-bullet">&#8250;</span> You need 12/15 (80%) to pass and earn certification</li>
-            <li><span class="concept-bullet">&#8250;</span> Each question is final &#8212; no going back</li>
-            <li><span class="concept-bullet">&#8250;</span> Your score and grade will display at the end</li>
-          </ul>
-        </div>
-        <button class="btn btn-gold" onclick="startExam()">Start Exam &#8594;</button>
-      </div>
-
-      <div id="cert-exam" style="display:none">
-        <div class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-            <div id="exam-qnum" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--gold)">QUESTION 1 OF 15</div>
-            <div id="exam-score-live" style="font-size:12px;color:var(--muted)">Score: 0/0</div>
-          </div>
-          <div id="exam-question" class="quiz-question" style="font-size:16px;margin-bottom:20px"></div>
-          <div id="exam-options" class="quiz-options"></div>
-          <div id="exam-feedback" style="display:none;margin-top:16px;padding:14px 16px;border-radius:6px;font-size:13px;line-height:1.6"></div>
-        </div>
-      </div>
-
-      <div id="cert-result" style="display:none">
-        <div class="card" style="text-align:center">
-          <div id="cert-score-display" style="font-family:'Bebas Neue',sans-serif;font-size:80px;letter-spacing:3px;margin-bottom:8px"></div>
-          <div id="cert-grade-display" style="font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;margin-bottom:16px"></div>
-          <div id="cert-status" style="font-size:18px;font-weight:700;margin-bottom:12px"></div>
-          <div id="cert-message" style="font-size:14px;color:var(--muted);margin-bottom:24px;line-height:1.6"></div>
-          <div id="cert-badge" style="display:none;background:linear-gradient(135deg,#0a1a0a,#0d200d);border:2px solid var(--gold);border-radius:12px;padding:32px;margin:0 auto 24px;max-width:400px">
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:var(--gold);margin-bottom:8px">DH-MCA TRAINING</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--text);margin-bottom:4px">CERTIFIED</div>
-            <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--gold-light);margin-bottom:16px">SALES PROFESSIONAL</div>
-            <div style="width:60px;height:1px;background:var(--gold);margin:0 auto 16px"></div>
-            <div id="cert-name" style="font-size:13px;color:var(--muted)"></div>
-          </div>
-          <button class="btn btn-ghost" onclick="retryExam()" id="retry-btn" style="display:none;margin-right:8px">Retake Exam</button>
-          <button class="btn btn-gold" onclick="completeDay(23)" id="finish-btn" style="display:none">Complete Training &#10003;</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- DAY 12: DEAL BUILDER -->
-    <div class="module" id="day12">
-      <div class="module-header">
-        <div class="module-eyebrow">Tools &#8212; Deal Builder</div>
-        <div class="module-title">Deal Builder</div>
-        <div class="module-subtitle">Run the numbers on any deal in seconds. Know the math cold before you ever get on the phone.</div>
-      </div>
-
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px">
-        <div class="card" style="margin-bottom:0">
-          <div class="card-title"><span class="icon">&#9881;&#65039;</span> Deal Inputs</div>
-          <div style="display:flex;flex-direction:column;gap:16px">
-            <div>
-              <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Advance Amount ($)</label>
-              <input type="number" id="db_advance" value="100000" oninput="calcDeal()" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:16px;padding:10px 14px;outline:none;transition:border-color 0.15s" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
-            </div>
-            <div>
-              <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Factor Rate (e.g. 1.35)</label>
-              <input type="number" id="db_factor" value="1.35" step="0.01" min="1.10" max="1.60" oninput="calcDeal()" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:16px;padding:10px 14px;outline:none;transition:border-color 0.15s" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
-            </div>
-            <div>
-              <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Estimated Term</label>
-              <div style="display:flex;gap:8px">
-                <input type="number" id="db_term" value="9" min="1" max="999" oninput="calcDeal()" style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:16px;padding:10px 14px;outline:none;transition:border-color 0.15s" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
-                <select id="db_term_unit" onchange="calcDeal()" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--gold-light);font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:10px 14px;outline:none;cursor:pointer;min-width:110px">
-                  <option value="days">Days</option>
-                  <option value="weeks">Weeks</option>
-                  <option value="months" selected>Months</option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <label style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:6px">Monthly Business Revenue ($)</label>
-              <input type="number" id="db_revenue" value="80000" oninput="calcDeal()" style="width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:16px;padding:10px 14px;outline:none;transition:border-color 0.15s" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
-            </div>
-          </div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:12px">
-          <div class="card" style="margin-bottom:0;background:#0d0d0d;border-color:var(--gold)">
-            <div style="font-size:10px;color:var(--gold);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Payback Amount</div>
-            <div id="db_payback" style="font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--gold-light);letter-spacing:1px">$135,000</div>
-          </div>
-          <div class="card" style="margin-bottom:0">
-            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Cost of Capital</div>
-            <div id="db_cost" style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--red);letter-spacing:1px">$35,000</div>
-          </div>
-          <div class="card" style="margin-bottom:0">
-            <div id="db_daily_label" style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">Daily Payment</div>
-            <div id="db_daily" style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--text);letter-spacing:1px">$714/day</div>
-          </div>
-          <div class="card" style="margin-bottom:0">
-            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px">% of Monthly Revenue</div>
-            <div id="db_pct" style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--text);letter-spacing:1px">21.9%</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><span class="icon">&#127897;&#65039;</span> Suggested Pitch Line</div>
-        <div id="db_pitch" style="font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold-light);line-height:1.8;background:#0d0d0d;padding:16px 20px;border-radius:6px;border-left:3px solid var(--gold)"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-title"><span class="icon">&#128202;</span> Factor Rate Comparison</div>
-        <table class="obj-table">
-          <tr><th>Factor Rate</th><th>Payback</th><th>Cost</th><th>Daily Payment</th><th>Grade</th></tr>
-          <tr id="dbr_115"><td style="color:var(--green)">1.15</td><td></td><td></td><td></td><td style="color:var(--green)">A Paper</td></tr>
-          <tr id="dbr_125"><td style="color:#4a9ede">1.25</td><td></td><td></td><td></td><td style="color:#4a9ede">B Tier</td></tr>
-          <tr id="dbr_135"><td style="color:var(--gold-light)">1.35</td><td></td><td></td><td></td><td style="color:var(--gold-light)">B/C Tier</td></tr>
-          <tr id="dbr_145"><td style="color:var(--red)">1.45</td><td></td><td></td><td></td><td style="color:var(--red)">C Tier</td></tr>
-          <tr id="dbr_150"><td style="color:#c39bd3">1.50</td><td></td><td></td><td></td><td style="color:#c39bd3">High Risk</td></tr>
-        </table>
-      </div>
-
-      <button class="btn btn-gold" onclick="completeDay(12)">Mark Deal Builder Complete &#10003;</button>
     </div>
 
     <!-- DAY 24: TEXTASSIST -->

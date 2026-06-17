@@ -77,112 +77,7 @@
   }
 
   // &#9472;&#9472; CERTIFICATION EXAM &#9472;&#9472;
-  const examQuestions = [
-    { q: "An MCA is legally defined as:", opts: ["A short-term business loan","A purchase of future receivables at a discount","A revolving line of credit","An equipment financing agreement"], ans: 1, day: 1 },
-    { q: "What is the correct formula for MCA payback amount?", opts: ["Advance &#247; Factor Rate","Advance + Interest","Advance &#215; Factor Rate","Advance &#215; APR &#247; 12"], ans: 2, day: 2 },
-    { q: "A $100,000 advance at a 1.35 factor rate. What is the cost of capital?", opts: ["$13,500","$35,000","$135,000","$1,350"], ans: 1, day: 2 },
-    { q: "Which industry typically has LUMPY deposits that look irregular but are normal?", opts: ["Restaurants","Medical practices","Contractors & Construction","Retail stores"], ans: 2, day: 3 },
-    { q: "When should you ask a funded client for referrals?", opts: ["Before you submit the deal","During underwriting","Right after the wire hits","30 days after funding"], ans: 2, day: 15 },
-    { q: "A merchant has TWO active MCA positions combined at $900/day. This is called:", opts: ["Renewal","Consolidation","Stacking","Syndication"], ans: 2, day: 2 },
-    { q: "What does ADB stand for and why does it matter to underwriters?", opts: ["Annual Daily Budget &#8212; measures yearly spend","Average Daily Balance &#8212; the floor underwriters evaluate risk on","Approved Deal Balance &#8212; the remaining payback","Adjusted Deposit Base &#8212; net of existing debits"], ans: 1, day: 11 },
-    { q: "A merchant is 55% paid down on their advance. What should a good rep do?", opts: ["Wait for them to call you","Call immediately &#8212; they qualify for renewal","Submit them to a new funder for a fresh advance","Nothing until they're 100% paid off"], ans: 1, day: 12 },
-    { q: "A funder declines your deal. Your first move should be:", opts: ["Tell the merchant and move on","Give up on that merchant","Ask the UW for the specific reason and provide context or reduce the ask","Submit to 5 other funders at once"], ans: 2, day: 13 },
-    { q: "When a merchant says I need to talk to my accountant, the best response is:", opts: ["OK call me back when you do","Great &#8212; can we get them on a quick call together?","Fine, I'll send you info by email","That's not necessary for this type of financing"], ans: 1, day: 16 },
-    { q: "Reverse consolidation is best described as:", opts: ["Taking multiple MCAs and combining them into one new advance","A funder making payments on existing positions while collecting one daily debit from the merchant","Paying off all positions and giving the merchant a credit line","Refinancing MCA debt into a bank loan"], ans: 1, day: 18 },
-    { q: "Which of these is NOT a red flag in bank statements?", opts: ["6+ NSFs per month","Daily round-number debits from multiple sources","Large lumpy deposits in a contractor account","Account opened 3 months ago"], ans: 2, day: 11 },
-    { q: "What is the correct response when a merchant compares your rate to a bank's 7% APR?", opts: ["Explain your APR is actually lower","Pivot to ROI: what will this capital do for their business?","Agree their bank is cheaper and offer to match","Explain the APR calculation in detail"], ans: 1, day: 7 },
-    { q: "A contact rate measures:", opts: ["How many merchants you funded","The percentage of dials that reach the decision-maker","How many deals were approved","Your daily submission count"], ans: 1, day: 20 },
-    { q: "The MOST important thing to do immediately after funding a client's deal is:", opts: ["Ask for a Google review","Set a renewal reminder and ask for a referral","Submit them to another funder for a second position","Send a thank you email and close the file"], ans: 1, day: 15 }
-  ];
 
-  let examIndex = 0;
-  let examCorrect = 0;
-  let examAnswered = 0;
-
-  function startExam() {
-    examIndex = 0; examCorrect = 0; examAnswered = 0;
-    document.getElementById('cert-start').style.display = 'none';
-    document.getElementById('cert-exam').style.display = 'block';
-    document.getElementById('cert-result').style.display = 'none';
-    loadExamQuestion();
-  }
-
-  function loadExamQuestion() {
-    if (examIndex >= examQuestions.length) { showExamResult(); return; }
-    const q = examQuestions[examIndex];
-    document.getElementById('exam-qnum').textContent = `QUESTION ${examIndex+1} OF ${examQuestions.length}`;
-    document.getElementById('exam-score-live').textContent = `Score: ${examCorrect}/${examAnswered}`;
-    document.getElementById('exam-question').textContent = q.q;
-    document.getElementById('exam-feedback').style.display = 'none';
-    const opts = document.getElementById('exam-options');
-    opts.innerHTML = '';
-    q.opts.forEach((opt, i) => {
-      const el = document.createElement('div');
-      el.className = 'quiz-option';
-      el.textContent = opt;
-      el.onclick = () => answerExam(i, el);
-      opts.appendChild(el);
-    });
-  }
-
-  function answerExam(chosen, el) {
-    const q = examQuestions[examIndex];
-    const allOpts = document.querySelectorAll('#exam-options .quiz-option');
-    allOpts.forEach(o => o.classList.add('disabled'));
-    const correct = chosen === q.ans;
-    el.classList.add(correct ? 'correct' : 'wrong');
-    if (correct) { examCorrect++; allOpts[q.ans].classList.add('correct'); }
-    examAnswered++;
-    const fb = document.getElementById('exam-feedback');
-    fb.style.display = 'block';
-    fb.style.background = correct ? '#0a1a0a' : '#1a0a0a';
-    fb.style.border = correct ? '1px solid #27AE60' : '1px solid #C0392B';
-    fb.style.color = correct ? '#7dce9c' : '#e07070';
-    fb.textContent = correct ? '&#10003; Correct!' : `&#10007; Incorrect. The correct answer is: "${q.opts[q.ans]}"`;
-    setTimeout(() => { examIndex++; loadExamQuestion(); }, 1800);
-  }
-
-  function showExamResult() {
-    document.getElementById('cert-exam').style.display = 'none';
-    document.getElementById('cert-result').style.display = 'block';
-    const pct = Math.round((examCorrect / examQuestions.length) * 100);
-    const passed = examCorrect >= 12;
-    let grade = 'F';
-    if (pct >= 97) grade = 'A+'; else if (pct >= 93) grade = 'A';
-    else if (pct >= 90) grade = 'A-'; else if (pct >= 87) grade = 'B+';
-    else if (pct >= 83) grade = 'B'; else if (pct >= 80) grade = 'B-';
-    else if (pct >= 77) grade = 'C+'; else if (pct >= 73) grade = 'C';
-    else if (pct >= 70) grade = 'C-'; else if (pct >= 65) grade = 'D+';
-    else if (pct >= 60) grade = 'D';
-    const color = pct >= 80 ? '#27AE60' : pct >= 70 ? '#E8B84B' : '#C0392B';
-    document.getElementById('cert-score-display').style.color = color;
-    document.getElementById('cert-score-display').textContent = `${examCorrect}/15`;
-    document.getElementById('cert-grade-display').style.color = color;
-    document.getElementById('cert-grade-display').textContent = grade;
-    document.getElementById('cert-status').style.color = color;
-    document.getElementById('cert-status').textContent = passed ? '&#127942; CERTIFIED &#8212; Congratulations!' : '&#10007; Not Passed &#8212; Review and Retry';
-    document.getElementById('cert-message').textContent = passed
-      ? `You scored ${examCorrect}/15 (${pct}%) and have earned your DH-MCA Certified Sales Professional designation. You are ready to work real deals.`
-      : `You scored ${examCorrect}/15 (${pct}%). You need 12/15 to pass. Review the days where you missed questions and retake when ready.`;
-    if (passed) {
-      document.getElementById('cert-badge').style.display = 'block';
-      document.getElementById('cert-name').textContent = `Certified on ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})} &#183; Score: ${pct}% &#183; Grade: ${grade}`;
-      document.getElementById('finish-btn').style.display = 'inline-block';
-    } else {
-      document.getElementById('retry-btn').style.display = 'inline-block';
-    }
-  }
-
-  function retryExam() {
-    document.getElementById('cert-result').style.display = 'none';
-    document.getElementById('cert-start').style.display = 'block';
-    document.getElementById('retry-btn').style.display = 'none';
-    document.getElementById('finish-btn').style.display = 'none';
-  }
-
-  // &#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;
-  // &#9472;&#9472; TEXTASSIST &#9472;&#9472;
-  // &#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;&#9552;
 
   // TEXTASSIST
   var taOptions = null;
@@ -201,7 +96,7 @@
         body: JSON.stringify({
           model: 'claude-sonnet-4-5',
           max_tokens: 800,
-          system: 'You are an MCA sales coach. Generate 3 text reply options. Return ONLY valid JSON: {"soft":{"label":"2-4 words","message":"reply text","note":"why it works"},"direct":{"label":"2-4 words","message":"reply text","note":"why it works"},"close":{"label":"2-4 words","message":"reply text","note":"why it works"}}. Soft=rapport. Direct=advances deal. Close=urgency. Short conversational replies.',
+          system: 'You are an MCA sales coach. Generate 3 text reply options. Return ONLY valid JSON: {"soft":{"label":"2-4 words","message":"reply text","note":"why it works"},"direct":{"label":"2-4 words","message":"reply text","note":"why it works"},"close":{"label":"2-4 words","message":"reply text","note":"why it works"}}. Soft=rapport. Direct=advances deal. Close=urgency. Keep replies short.',
           messages: [{ role: 'user', content: 'Merchant: ' + name + '. Their text: ' + msg }]
         })
       });
@@ -247,7 +142,7 @@
     taOptions = null;
   }
 
-  function resetChat() {  function resetChat() {
+  function resetChat() {
     chatHistory = [];
     const s = scenarios[currentScenario];
     document.getElementById('chatArea').innerHTML = `
